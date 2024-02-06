@@ -37,6 +37,10 @@ class MyObject
     #[ORM\OneToMany(mappedBy: 'myObject', targetEntity: Comment::class, orphanRemoval: true)]
     private Collection $comments;
 
+    #[ORM\ManyToOne(inversedBy: 'objects')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $category = null;
+
     public function __construct()
     {
         $this->myCollections = new ArrayCollection();
@@ -161,6 +165,18 @@ class MyObject
                 $comment->setMyObject(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
 
         return $this;
     }
