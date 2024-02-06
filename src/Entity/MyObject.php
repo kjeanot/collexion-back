@@ -34,9 +34,13 @@ class MyObject
     #[ORM\ManyToMany(targetEntity: MyCollection::class, mappedBy: 'myobjects')]
     private Collection $myCollections;
 
+    #[ORM\OneToMany(mappedBy: 'myObject', targetEntity: Comment::class, orphanRemoval: true)]
+    private Collection $comments;
+
     public function __construct()
     {
         $this->myCollections = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -126,6 +130,36 @@ class MyObject
     {
         if ($this->myCollections->removeElement($myCollection)) {
             $myCollection->removeMyobject($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setMyObject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getMyObject() === $this) {
+                $comment->setMyObject(null);
+            }
         }
 
         return $this;
