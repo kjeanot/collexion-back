@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -26,6 +29,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $nickname = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\Column(length: 2083, nullable: true)]
+    private ?string $picture = null;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: MyCollection::class, orphanRemoval: true)]
+    private Collection $mycollections;
+
+    public function __construct()
+    {
+        $this->mycollections = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -95,5 +115,71 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getNickname(): ?string
+    {
+        return $this->nickname;
+    }
+
+    public function setNickname(string $nickname): static
+    {
+        $this->nickname = $nickname;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getPicture(): ?string
+    {
+        return $this->picture;
+    }
+
+    public function setPicture(?string $picture): static
+    {
+        $this->picture = $picture;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MyCollection>
+     */
+    public function getMycollections(): Collection
+    {
+        return $this->mycollections;
+    }
+
+    public function addMycollection(MyCollection $mycollection): static
+    {
+        if (!$this->mycollections->contains($mycollection)) {
+            $this->mycollections->add($mycollection);
+            $mycollection->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMycollection(MyCollection $mycollection): static
+    {
+        if ($this->mycollections->removeElement($mycollection)) {
+            // set the owning side to null (unless already changed)
+            if ($mycollection->getUser() === $this) {
+                $mycollection->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
