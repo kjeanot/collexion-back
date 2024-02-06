@@ -21,9 +21,17 @@ class Category
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: MyObject::class, orphanRemoval: true)]
     private Collection $objects;
 
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'categories')]
+    private Collection $category;
+
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'category')]
+    private Collection $categories;
+
     public function __construct()
     {
         $this->objects = new ArrayCollection();
+        $this->category = new ArrayCollection();
+        $this->categories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -71,5 +79,37 @@ class Category
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getCategory(): Collection
+    {
+        return $this->category;
+    }
+
+    public function addCategory(self $category): static
+    {
+        if (!$this->category->contains($category)) {
+            $this->category->add($category);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(self $category): static
+    {
+        $this->category->removeElement($category);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
     }
 }
