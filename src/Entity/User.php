@@ -42,9 +42,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: MyCollection::class, orphanRemoval: true)]
     private Collection $mycollections;
 
+    #[ORM\ManyToMany(targetEntity: MyCollection::class, inversedBy: 'users')]
+    private Collection $myfavoritescollections;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Comment::class, orphanRemoval: true)]
+    private Collection $comments;
+
     public function __construct()
     {
         $this->mycollections = new ArrayCollection();
+        $this->myfavoritescollections = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -177,6 +185,60 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($mycollection->getUser() === $this) {
                 $mycollection->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MyCollection>
+     */
+    public function getMyfavoritescollections(): Collection
+    {
+        return $this->myfavoritescollections;
+    }
+
+    public function addMyfavoritescollection(MyCollection $myfavoritescollection): static
+    {
+        if (!$this->myfavoritescollections->contains($myfavoritescollection)) {
+            $this->myfavoritescollections->add($myfavoritescollection);
+        }
+
+        return $this;
+    }
+
+    public function removeMyfavoritescollection(MyCollection $myfavoritescollection): static
+    {
+        $this->myfavoritescollections->removeElement($myfavoritescollection);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getUser() === $this) {
+                $comment->setUser(null);
             }
         }
 
