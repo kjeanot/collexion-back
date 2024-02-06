@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\MyCollectionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\MyCollectionRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MyCollectionRepository::class)]
 class MyCollection
@@ -14,18 +15,23 @@ class MyCollection
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get_collections'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['get_collections'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 2083)]
+    #[Groups(['get_collections'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['get_collections'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['get_collections'])]
     private ?float $rating = null;
 
     #[ORM\ManyToOne(inversedBy: 'mycollections')]
