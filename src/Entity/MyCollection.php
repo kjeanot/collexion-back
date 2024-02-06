@@ -35,9 +35,13 @@ class MyCollection
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'myfavoritescollections')]
     private Collection $users;
 
+    #[ORM\ManyToMany(targetEntity: MyObject::class, inversedBy: 'myCollections')]
+    private Collection $myobjects;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->myobjects = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -128,6 +132,30 @@ class MyCollection
         if ($this->users->removeElement($user)) {
             $user->removeMyfavoritescollection($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MyObject>
+     */
+    public function getMyobjects(): Collection
+    {
+        return $this->myobjects;
+    }
+
+    public function addMyobject(MyObject $myobject): static
+    {
+        if (!$this->myobjects->contains($myobject)) {
+            $this->myobjects->add($myobject);
+        }
+
+        return $this;
+    }
+
+    public function removeMyobject(MyObject $myobject): static
+    {
+        $this->myobjects->removeElement($myobject);
 
         return $this;
     }

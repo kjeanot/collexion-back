@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MyObjectRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,6 +30,14 @@ class MyObject
 
     #[ORM\Column(length: 255)]
     private ?string $condition = null;
+
+    #[ORM\ManyToMany(targetEntity: MyCollection::class, mappedBy: 'myobjects')]
+    private Collection $myCollections;
+
+    public function __construct()
+    {
+        $this->myCollections = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -90,6 +100,33 @@ class MyObject
     public function setEtat(string $etat): static
     {
         $this->condition = $etat;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MyCollection>
+     */
+    public function getMyCollections(): Collection
+    {
+        return $this->myCollections;
+    }
+
+    public function addMyCollection(MyCollection $myCollection): static
+    {
+        if (!$this->myCollections->contains($myCollection)) {
+            $this->myCollections->add($myCollection);
+            $myCollection->addMyobject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMyCollection(MyCollection $myCollection): static
+    {
+        if ($this->myCollections->removeElement($myCollection)) {
+            $myCollection->removeMyobject($this);
+        }
 
         return $this;
     }
