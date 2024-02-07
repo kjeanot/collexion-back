@@ -121,7 +121,7 @@ class MyCollection
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
-            $user->addMyfavoritescollection($this);
+            $user->addMyFavoriteCollection($this);
         }
 
         return $this;
@@ -130,7 +130,7 @@ class MyCollection
     public function removeUser(User $user): static
     {
         if ($this->users->removeElement($user)) {
-            $user->removeMyfavoritescollection($this);
+            $user->removeMyFavoriteCollection($this);
         }
 
         return $this;

@@ -29,7 +29,7 @@ class MyObject
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $condition = null;
+    private ?string $state = null;
 
     #[ORM\ManyToMany(targetEntity: MyCollection::class, mappedBy: 'myobjects')]
     private Collection $myCollections;
@@ -100,14 +100,14 @@ class MyObject
         return $this;
     }
 
-    public function getEtat(): ?string
+    public function getstate(): ?string
     {
-        return $this->condition;
+        return $this->state;
     }
 
-    public function setEtat(string $etat): static
+    public function setstate(string $state): static
     {
-        $this->condition = $etat;
+        $this->state = $state;
 
         return $this;
     }
