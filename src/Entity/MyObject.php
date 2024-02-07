@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\MyObjectRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -29,7 +30,7 @@ class MyObject
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $condition = null;
+    private ?string $state = null;
 
     #[ORM\ManyToMany(targetEntity: MyCollection::class, mappedBy: 'myobjects')]
     private Collection $myCollections;
@@ -41,10 +42,18 @@ class MyObject
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $created_at = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updated_at = null;
+
     public function __construct()
     {
         $this->myCollections = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->created_at = new DateTimeImmutable();
+        $this->updated_at = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -100,14 +109,14 @@ class MyObject
         return $this;
     }
 
-    public function getEtat(): ?string
+    public function getstate(): ?string
     {
-        return $this->condition;
+        return $this->state;
     }
 
-    public function setEtat(string $etat): static
+    public function setstate(string $state): static
     {
-        $this->condition = $etat;
+        $this->state = $state;
 
         return $this;
     }
@@ -177,6 +186,30 @@ class MyObject
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updated_at): static
+    {
+        $this->updated_at = $updated_at;
 
         return $this;
     }

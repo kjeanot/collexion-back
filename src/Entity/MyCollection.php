@@ -38,10 +38,22 @@ class MyCollection
     #[ORM\ManyToMany(targetEntity: MyObject::class, inversedBy: 'myCollections')]
     private Collection $myobjects;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $created_at = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updated_at = null;
+
+    #[ORM\Column]
+    private ?bool $is_active = null;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->myobjects = new ArrayCollection();
+        $this->created_at = new \DateTimeImmutable();
+        $this->updated_at = new \DateTimeImmutable();
+        $this->is_active = false;
     }
 
     public function getId(): ?int
@@ -121,7 +133,7 @@ class MyCollection
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
-            $user->addMyfavoritescollection($this);
+            $user->addMyFavoriteCollection($this);
         }
 
         return $this;
@@ -130,7 +142,7 @@ class MyCollection
     public function removeUser(User $user): static
     {
         if ($this->users->removeElement($user)) {
-            $user->removeMyfavoritescollection($this);
+            $user->removeMyFavoriteCollection($this);
         }
 
         return $this;
@@ -156,6 +168,42 @@ class MyCollection
     public function removeMyobject(MyObject $myobject): static
     {
         $this->myobjects->removeElement($myobject);
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updated_at): static
+    {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function isIsActive(): ?bool
+    {
+        return $this->is_active;
+    }
+
+    public function setIsActive(bool $is_active): static
+    {
+        $this->is_active = $is_active;
 
         return $this;
     }
