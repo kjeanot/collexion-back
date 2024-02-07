@@ -27,6 +27,9 @@ class Category
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'category')]
     private Collection $categories;
 
+    #[ORM\Column(length: 2083)]
+    private ?string $image = null;
+
     public function __construct()
     {
         $this->objects = new ArrayCollection();
@@ -111,5 +114,17 @@ class Category
     public function getCategories(): Collection
     {
         return $this->categories;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): static
+    {
+        $this->image = $image;
+
+        return $this;
     }
 }

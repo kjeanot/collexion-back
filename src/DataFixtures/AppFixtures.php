@@ -27,11 +27,13 @@ class AppFixtures extends Fixture
         for($i = 0; $i < 10; $i++){
             $parentCategory = new Category();
             $parentCategory->setName('Category parent ' . $i);
+            $parentCategory->setImage('https://via.placeholder.com/150');
             $manager->persist($parentCategory);
             // Créer 3 categories enfants pour chaque catégorie parents
             for($j = 0; $j < 3; $j++){
                 $enfantCategory = new Category();
                 $enfantCategory->setName('Category enfant ' . $j);
+                $enfantCategory->setImage('https://via.placeholder.com/150');
                 $manager->persist($enfantCategory);
                 // Assigne une catégorie enfant à chaque catégorie parents
                 $parentCategory->addCategory($enfantCategory);
@@ -52,9 +54,8 @@ class AppFixtures extends Fixture
             $collection->setUser($user);
             $collection->setName('Ma premiere collection ');
             $collection->setImage('https://via.placeholder.com/150');
-            $collection->setDescription( $i .'test' );
+            $collection->setDescription( $i .' Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Elementum nisi quis eleifend quam adipiscing vitae proin sagittis nisl. Pretium lectus quam id leo in vitae turpis massa. Condimentum mattis pellentesque id nibh tortor id aliquet lectus. Ac turpis egestas integer eget aliquet nibh praesent tristique. ' );
             $manager->persist($collection);
-
             $manager->persist($user);
 
             // Créer 3 objets pour chaques collections
@@ -100,7 +101,7 @@ class AppFixtures extends Fixture
             $comment = new Comment();
             // On attribue un utilisateur aléatoire à chaque commentaire creer
             $comment->setUser($users[array_rand($users)]);
-            $comment->setContent('Comment ');
+            $comment->setContent('Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. ');
             $comment->setMyObject($object);
             $manager->persist($comment);
         }
