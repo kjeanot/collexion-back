@@ -199,7 +199,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->myfavoritescollections;
     }
 
-    public function addMyfavoritescollection(MyCollection $myfavoritescollection): static
+    public function addMyFavoriteCollection(MyCollection $myfavoritescollection): static
     {
         if (!$this->myfavoritescollections->contains($myfavoritescollection)) {
             $this->myfavoritescollections->add($myfavoritescollection);
@@ -208,7 +208,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeMyfavoritescollection(MyCollection $myfavoritescollection): static
+    public function removeMyFavoriteCollection(MyCollection $myfavoritescollection): static
     {
         $this->myfavoritescollections->removeElement($myfavoritescollection);
 
