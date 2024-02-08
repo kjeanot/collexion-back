@@ -45,7 +45,7 @@ class MyCollectionRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
-    /* SERT DANS LA ROUTE RANDOM => A FAIRE
+    // SERT DANS LA ROUTE RANDOM => A FAIRE
     public function getRandomMovie()
         {
             $sql = "SELECT * FROM my_collection
@@ -57,7 +57,6 @@ class MyCollectionRepository extends ServiceEntityRepository
             // returns an array of arrays (i.e. a raw data set)
             return $resultSet->fetchAssociative();
         }
-        */
 
     /*
     public function getRandomMovieDql()

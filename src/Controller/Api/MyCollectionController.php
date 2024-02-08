@@ -78,64 +78,65 @@ class MyCollectionController extends AbstractController
             // groups authorized
             ['groups' => 'get_collections']
             );
-    }
-
+    } 
+    
     /**
-     * create one collection 
-     *
-     * @param MyCollectionRepository $myCollectionRepository
-     * @return Response
-     */
-    #[Route('/collection/create', name: 'api_my_collection_create',methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $entityManager)
-    {
-        // // serialize
-        // $data = json_decode($request->getContent());
-        // // set up a MyCollection entity
-        // $myCollection = new MyCollection();
-        // // create a form bounded to MyCollection entity
-        // $form = $this->createForm(MyCollectionType::class, $myCollection);
-        // // send request to form
-        // $form->handleRequest($request);
-        // // check if the form is submitted and valid
-        // if ($form->isSubmitted() && $form->isValid()) {
-        //     // record in bdd
-        //     $entityManager->persist($myCollection);
-        //     $entityManager->flush();
-
-        $user = new User();
-            $user->setEmail('usertest@user.com');
-            $user->setNickname('usertest');
-            $user->setPassword(password_hash('usertest', PASSWORD_BCRYPT));
-            $user->setRoles(['ROLE_USER']);
-            $entityManager->persist($user);
-
-        $collection = new MyCollection();
-        $collection->setUser($user);
-        $collection->setName("Name");
-        $collection->setImage("Image");
-        $collection->setDescription("Description");
-        $collection->setRating(3);
-        $collection->setCreatedAt();
-        
-        $entityManager->persist($collection);
-        $entityManager->flush();
-
-    }
-    /*
-    ROUTE A FAIRE
-    #[Route('/collection/random', name: 'api_my_collection_random', methods: ['GET'])]
-    public function random(MyCollectionRepository $myCollectionRepository)
-    {
-        // retrieve a random collection
-        $collection = $myCollectionRepository->getRandomMovie();
-        return $this->json(
-            $collection,
-            200,
-            [],
-            ['groups' => ['get_collections']]
-        );
-    }
+    * create one collection 
+    *
+    * @param MyCollectionRepository $myCollectionRepository
+    * @return Response
     */
+   #[Route('/collection/create', name: 'api_my_collection_create',methods: ['POST'])]
+   public function create(Request $request, EntityManagerInterface $entityManager)
+   {
+       $user = new User();
+       $user->setEmail('user22@user.com');
+       $user->setNickname('userlfchgjkfghkj');
+       $user->setPassword(password_hash('usertest', PASSWORD_BCRYPT));
+       $user->setRoles(['ROLE_USER']);
+       $entityManager->persist($user);
+
+       $collection = new MyCollection();
+       $collection->setUser($user);
+       $collection->setName("Name");
+       $collection->setImage("Image");
+       $collection->setDescription("Description");
+       $collection->setRating(3);
+
+       $entityManager->persist($collection);
+       $entityManager->flush();
+       return $this->json([$collection, 201, ['message' => 'create successful']]);
+
+       // // serialize
+       // $data = json_decode($request->getContent());
+       // // set up a MyCollection entity
+       // $myCollection = new MyCollection();
+       // // create a form bounded to MyCollection entity
+       // $form = $this->createForm(MyCollectionType::class, $myCollection);
+       // // send request to form
+       // $form->handleRequest($request);
+       // // check if the form is submitted and valid
+       // if ($form->isSubmitted() && $form->isValid()) {
+       //     // record in bdd
+       //     $entityManager->persist($myCollection);
+       //     $entityManager->flush();
+       // }
+       
+       // return $form;
+
+   }
+    
+    // #[Route('/collection/random', name: 'api_my_collection_random', methods: ['GET'])]
+    // public function random(MyCollectionRepository $myCollectionRepository)
+    // {
+    //     // retrieve a random collection
+    //     $collection = $myCollectionRepository->getRandomMovie();
+    //     return $this->json(
+    //         $collection,
+    //         200,
+    //         [],
+    //         ['groups' => ['get_collections']]
+    //     );
+    // }
     
 }
