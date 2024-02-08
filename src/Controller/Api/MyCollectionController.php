@@ -113,8 +113,8 @@ class MyCollectionController extends AbstractController
     * update one collection
     * 
     */
-    #[Route('/collection/updated/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
-    public function update(MyCollection $myCollection, EntityManagerInterface $entityManager): Response
+    #[Route('/collection/update/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
+    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager): Response
     {
         // check if $myCollection doesn't exist
         if (!$myCollection) {
@@ -133,6 +133,24 @@ class MyCollectionController extends AbstractController
  
         return $this->json(['message' => 'updated successful', 200]);
  
+    }
+
+    #[Route('/collection/delete/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
+    public function delete(MyCollection $myCollection, EntityManagerInterface $manager): Response
+    {
+         // check if $myCollection doesn't exist
+        if (!$myCollection) {
+            return $this->json(
+                ['message' => 'collection inexistant'],
+                404,
+                );
+        }
+
+        $manager->remove($myCollection);
+        $manager->flush();
+
+        return $this->json(['message' => 'delete successful', 200]);
+       
     }
     
     // #[Route('/collection/random', name: 'api_my_collection_random', methods: ['GET'])]
