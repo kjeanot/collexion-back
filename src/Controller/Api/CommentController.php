@@ -33,8 +33,32 @@ class CommentController extends AbstractController
         return $this->json(
             $comments,
             200,
-            [],
+            ['Access-Control-Allow-Origin' => '*'],
             ['groups' => 'get_comments']
         );
     }
+
+    /**
+     * list one comment by its id
+     *
+     * @param CommentRepository $myCollectionRepository
+     * @return Response
+     */
+    #[Route('/comment/{id}', name: 'api_my_comment_show',methods: ['GET'])]
+    public function show(Comment $comment): Response
+    {
+        if (!$comment) {
+            return $this->json(
+                "Error : Commentaire inexistant",
+                404
+            );
+        }
+
+        return $this->json(
+            $comment,
+            200,
+            ['Access-Control-Allow-Origin' => '*'],
+            ['groups' => 'get_comments']
+            );
+    } 
 }
