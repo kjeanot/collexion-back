@@ -107,7 +107,7 @@ class MyCollectionController extends AbstractController
 
    }
 
-      /**
+    /**
     * update one collection
     *
     * @param MyCollectionRepository $myCollectionRepository

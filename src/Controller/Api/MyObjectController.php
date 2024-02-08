@@ -97,4 +97,35 @@ class MyObjectController extends AbstractController
     return $this->json([201, ['message' => 'create successful']]);
 
    }
+
+    /**
+    * update one object
+    *
+    * @param MyObjectRepository $myObjectRepository
+    * @return Response
+    */
+    #[Route('/object/update/{id}', name: 'api_my_object_update',methods: ['PUT'])]
+    public function update(MyObject $object = null, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository): Response
+    {
+        if (!$object) {
+            return $this->json(
+                "Error : Collection inexistante",
+                404
+            );
+        }
+
+        $category = $categoryRepository->find(15);
+ 
+        $object->setCategory($category);
+        $object->setName('Object je re test api ');
+        $object->setTitle('Test je re api ');
+        $object->setImage('https://via.placeholder.com/150');
+        $object->setDescription('Description je re test api ');
+        $object->setState('State je re test api ');
+        $entityManager->flush();
+ 
+        return $this->json(['message' => 'updated successful', 200]);
+ 
+    }
+
 }

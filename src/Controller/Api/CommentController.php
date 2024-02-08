@@ -82,15 +82,44 @@ class CommentController extends AbstractController
         $object = $myObjectRepository->find(10);
 
         // set datas
-        $collection = new Comment();
-        $collection->setContent("Content");
-        $collection->setUser($user);
-        $collection->setMyObject($object);
+        $comment = new Comment();
+        $comment->setContent("Content");
+        $comment->setUser($user);
+        $comment->setMyObject($object);
  
         // record in database
-        $entityManager->persist($collection);
+        $entityManager->persist($comment);
         $entityManager->flush();
         return $this->json([201, ['message' => 'create successful']]);
 
     }
+
+    /**
+    * update one collection
+    *
+    * @param CommentRepository $CommentRepository
+    * @return Response
+    */
+    
+    //#[Route('/collection/update/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
+    //public function update(Comment $comment = null, EntityManagerInterface $entityManager): Response
+    //{
+        // check if $myCollection doesn't exist
+      //  if (!$comment) {
+        //    return $this->json(
+         //       "Error : Commentaire inexistante",
+                // status code
+                // 404
+    //         );
+    //     }
+        
+    //     $myCollection->setName("hrthsrths");
+    //     $myCollection->setImage("hsrthsrth");
+    //     $myCollection->setDescription("thsrthsrthszrth");
+    //     $myCollection->setRating(5);
+    //     $entityManager->flush();
+        
+    //     return $this->json(['message' => 'updated successful', 200]);
+        
+    // }
 }
