@@ -111,7 +111,9 @@ class MyCollectionController extends AbstractController
 
       /**
     * update one collection
-    * 
+    *
+    * @param MyCollectionRepository $myCollectionRepository
+    * @return Response
     */
     #[Route('/collection/update/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
     public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager): Response
@@ -135,6 +137,12 @@ class MyCollectionController extends AbstractController
  
     }
 
+    /**
+    * delete one collection
+    * 
+    * @param MyCollectionRepository $myCollectionRepository
+    * @return Response
+    */
     #[Route('/collection/delete/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
     public function delete(MyCollection $myCollection, EntityManagerInterface $manager): Response
     {
