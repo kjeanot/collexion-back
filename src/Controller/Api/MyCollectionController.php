@@ -107,24 +107,33 @@ class MyCollectionController extends AbstractController
        $entityManager->flush();
        return $this->json([$collection, 201, ['message' => 'create successful']]);
 
-       // // serialize
-       // $data = json_decode($request->getContent());
-       // // set up a MyCollection entity
-       // $myCollection = new MyCollection();
-       // // create a form bounded to MyCollection entity
-       // $form = $this->createForm(MyCollectionType::class, $myCollection);
-       // // send request to form
-       // $form->handleRequest($request);
-       // // check if the form is submitted and valid
-       // if ($form->isSubmitted() && $form->isValid()) {
-       //     // record in bdd
-       //     $entityManager->persist($myCollection);
-       //     $entityManager->flush();
-       // }
-       
-       // return $form;
-
    }
+
+      /**
+    * update one collection
+    * 
+    */
+    #[Route('/collection/updated/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
+    public function update(MyCollection $myCollection, EntityManagerInterface $entityManager): Response
+    {
+        // check if $myCollection doesn't exist
+        if (!$myCollection) {
+            return $this->json(
+                "Error : Collection inexistante",
+                // status code
+                404
+            );
+        }
+ 
+        $myCollection->setName("hrthsrths");
+        $myCollection->setImage("hsrthsrth");
+        $myCollection->setDescription("thsrthsrthszrth");
+        $myCollection->setRating(5);
+        $entityManager->flush();
+ 
+        return $this->json(['message' => 'updated successful', 200]);
+ 
+    }
     
     // #[Route('/collection/random', name: 'api_my_collection_random', methods: ['GET'])]
     // public function random(MyCollectionRepository $myCollectionRepository)
