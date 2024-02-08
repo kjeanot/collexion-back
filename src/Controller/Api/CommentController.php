@@ -2,8 +2,13 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\User;
 use App\Entity\Comment;
+use App\Entity\MyObject;
 use App\Repository\CommentRepository;
+use App\Repository\MyObjectRepository;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -61,4 +66,31 @@ class CommentController extends AbstractController
             ['groups' => 'get_comments']
             );
     } 
+
+    /**
+    * create one comment 
+    *
+    * @param MyCommentRepository $myCollectionRepository
+    * @return Response
+    */
+    #[Route('/comment/create', name: 'api_my_comment_create',methods: ['POST'])]
+    public function create(EntityManagerInterface $entityManager, UserRepository $userRepository, MyObjectRepository $myObjectRepository)
+    {
+        // retrieve user
+        $user = $userRepository->find(3);
+        // retrieve object
+        $object = $myObjectRepository->find(10);
+
+        // set datas
+        $collection = new Comment();
+        $collection->setContent("Content");
+        $collection->setUser($user);
+        $collection->setMyObject($object);
+ 
+        // record in database
+        $entityManager->persist($collection);
+        $entityManager->flush();
+        return $this->json([201, ['message' => 'create successful']]);
+
+    }
 }

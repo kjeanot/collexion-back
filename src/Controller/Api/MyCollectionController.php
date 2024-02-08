@@ -6,6 +6,7 @@ use App\Entity\MyCollection;
 use App\Entity\User;
 use App\Form\MyCollectionType;
 use App\Repository\MyCollectionRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,7 +75,7 @@ class MyCollectionController extends AbstractController
             // status code
             200,
             // header
-            ['Access-Control-Allow-Origin' => '*'],
+            ['Access-Control-Allow-Origin' => '*' ],
             // groups authorized
             ['groups' => 'get_collections']
             );
@@ -87,14 +88,11 @@ class MyCollectionController extends AbstractController
     * @return Response
     */
    #[Route('/collection/create', name: 'api_my_collection_create',methods: ['POST'])]
-   public function create(Request $request, EntityManagerInterface $entityManager)
+   public function create(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository)
    {
-       $user = new User();
-       $user->setEmail('user22@user.com');
-       $user->setNickname('userlfchgjkfghkj');
-       $user->setPassword(password_hash('usertest', PASSWORD_BCRYPT));
-       $user->setRoles(['ROLE_USER']);
-       $entityManager->persist($user);
+
+    // retrieve user
+    $user = $userRepository->find(5);
 
        $collection = new MyCollection();
        $collection->setUser($user);
@@ -105,7 +103,7 @@ class MyCollectionController extends AbstractController
 
        $entityManager->persist($collection);
        $entityManager->flush();
-       return $this->json([$collection, 201, ['message' => 'create successful']]);
+       return $this->json([201, ['message' => 'create successful']]);
 
    }
 

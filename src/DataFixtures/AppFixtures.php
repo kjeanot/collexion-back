@@ -66,7 +66,7 @@ class AppFixtures extends Fixture
                 $object->setImage('https://via.placeholder.com/150');
                 $object->setDescription('Description ' . $j);
                 $object->setState('State ' . $j);
-                $object->setCategory($parentCategory);
+                $object->setCategory($enfantCategory);
                 $manager->persist($object);
                 $collection->addMyobject($object);
                 $manager->persist($collection);
