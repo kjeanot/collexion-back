@@ -127,5 +127,26 @@ class MyObjectController extends AbstractController
         return $this->json(['message' => 'updated successful', 200]);
  
     }
+    /**
+    * delete one object
+    * 
+    * @param MyObjectRepository $myObjectRepository
+    * @return Response
+    */
+    #[Route('/object/delete/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
+    public function delete(MyObject $Object, EntityManagerInterface $manager): Response
+    {
+        if (!$Object) {
+            return $this->json(
+                ['message' => 'objet inexistant'],
+                404,
+                );
+        }
 
+        $manager->remove($Object);
+        $manager->flush();
+
+        return $this->json(['message' => 'delete successful', 200]);
+       
+    }
 }
