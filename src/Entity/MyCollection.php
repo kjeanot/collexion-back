@@ -36,15 +36,18 @@ class MyCollection
 
     #[ORM\ManyToOne(inversedBy: 'mycollections')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get_collections'])]
     private ?User $user = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'myfavoritescollections')]
     private Collection $users;
 
     #[ORM\ManyToMany(targetEntity: MyObject::class, inversedBy: 'myCollections')]
+    #[Groups(['get_collections'])]
     private Collection $myobjects;
 
     #[ORM\Column]
+    #[Groups(['get_collections'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]
