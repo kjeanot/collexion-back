@@ -16,15 +16,18 @@ class CategoryType extends AbstractType
             ->add('name')
             ->add('image')
             ->add('category', EntityType::class, [
+                'label' => 'Catégorie enfant',
                 'class' => Category::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
                 'multiple' => true,
+                'expanded' => true,
             ])
-            ->add('categories', EntityType::class, [
-                'class' => Category::class,
-                'choice_label' => 'id',
-                'multiple' => true,
-            ])
+            // ->add('categories', EntityType::class, [
+            //     'class' => Category::class,
+            //     'choice_label' => 'name',
+            //     'multiple' => true,
+            //     'expanded' => true,
+            // ])
         ;
     }
 

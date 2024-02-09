@@ -24,6 +24,32 @@ class CategoryRepository extends ServiceEntityRepository
 //    /**
 //     * @return Category[] Returns an array of Category objects
 //     */
+public function  findAllCategoriesChild()
+   {
+    $conn = $this->getEntityManager()->getConnection();
+
+    $sql = '
+    SELECT DISTINCT c.name
+    FROM category_category As cc
+    INNER JOIN category AS c ON cc.category_target = c.id
+        ';
+
+    $resultSet = $conn->executeQuery($sql);
+    return $resultSet->fetchAssociative();
+   }
+   public function  findAllCategoriesParent()
+   {
+    $conn = $this->getEntityManager()->getConnection();
+
+    $sql = '
+    SELECT DISTINCT c.id, c.name, c.image
+    FROM category_category As cc
+    INNER JOIN category AS c ON cc.category_source = c.id
+        ';
+
+    $resultSet = $conn->executeQuery($sql);
+    return $resultSet->fetchAllAssociative();
+   }
 //    public function findByExampleField($value): array
 //    {
 //        return $this->createQueryBuilder('c')
