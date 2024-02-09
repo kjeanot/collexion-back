@@ -50,7 +50,7 @@ class CommentController extends AbstractController
      * @return Response
      */
     #[Route('/comment/{id}', name: 'api_my_comment_show',methods: ['GET'])]
-    public function show(Comment $comment): Response
+    public function show(Comment $comment = null): Response
     {
         if (!$comment) {
             return $this->json(
