@@ -46,7 +46,7 @@ class CommentController extends AbstractController
     /**
      * list one comment by its id
      *
-     * @param CommentRepository $myCollectionRepository
+     * @param CommentRepository $commentRepository
      * @return Response
      */
     #[Route('/comment/{id}', name: 'api_my_comment_show',methods: ['GET'])]
@@ -70,7 +70,7 @@ class CommentController extends AbstractController
     /**
     * create one comment 
     *
-    * @param MyCommentRepository $myCollectionRepository
+    * @param CommentRepository $commentRepository
     * @return Response
     */
     #[Route('/comment/create', name: 'api_my_comment_create',methods: ['POST'])]
@@ -97,7 +97,7 @@ class CommentController extends AbstractController
     /**
     * update one comment
     *
-    * @param MyCommentRepository $myCommentRepository
+    * @param CommentRepository $commentRepository
     * @return Response
     */
     #[Route('/comment/update/{id}', name: 'api_my_comment_update',methods: ['PUT'])]
@@ -124,5 +124,30 @@ class CommentController extends AbstractController
  
         return $this->json(['message' => 'updated successful', 200]);
  
+    }
+
+    /**
+    * delete one comment
+    * 
+    * @param CommentRepository $commentRepository
+    * @return Response
+    */
+    #[Route('/comment/delete/{id}', name: 'api_my_comment_delete', methods: ['DELETE'])]
+    public function delete(Comment $comment = null , EntityManagerInterface $manager): Response
+    {
+         // check if $comment doesn't exist
+        if (!$comment) {
+            return $this->json(
+                ['message' => 'collection inexistant'],
+                404,
+                );
+        }
+        // delete 
+        $manager->remove($comment);
+        // record in database
+        $manager->flush();
+
+        return $this->json(['message' => 'delete successful', 200]);
+       
     }
 }

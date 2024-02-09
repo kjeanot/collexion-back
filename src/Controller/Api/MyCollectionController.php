@@ -142,7 +142,7 @@ class MyCollectionController extends AbstractController
     * @return Response
     */
     #[Route('/collection/delete/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
-    public function delete(MyCollection $myCollection, EntityManagerInterface $manager): Response
+    public function delete(MyCollection $myCollection = null, EntityManagerInterface $manager): Response
     {
          // check if $myCollection doesn't exist
         if (!$myCollection) {
