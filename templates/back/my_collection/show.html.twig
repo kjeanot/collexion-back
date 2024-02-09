@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MyCollection{% endblock %}
+
+{% block body %}
+    <h1>MyCollection</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ my_collection.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ my_collection.name }}</td>
+            </tr>
+            <tr>
+                <th>Image</th>
+                <td>{{ my_collection.image }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ my_collection.description }}</td>
+            </tr>
+            <tr>
+                <th>Rating</th>
+                <td>{{ my_collection.rating }}</td>
+            </tr>
+            <tr>
+                <th>Created_at</th>
+                <td>{{ my_collection.createdAt ? my_collection.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Updated_at</th>
+                <td>{{ my_collection.updatedAt ? my_collection.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Is_active</th>
+                <td>{{ my_collection.isActive ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_back_my_collection_index') }}">back to list</a>
+
+    <a href="{{ path('app_back_my_collection_edit', {'id': my_collection.id}) }}">edit</a>
+
+    {{ include('back/my_collection/_delete_form.html.twig') }}
+{% endblock %}
