@@ -133,7 +133,7 @@ class CommentController extends AbstractController
     * @return Response
     */
     #[Route('/comment/delete/{id}', name: 'api_my_comment_delete', methods: ['DELETE'])]
-    public function delete(Comment $comment = null , EntityManagerInterface $manager): Response
+    public function delete(Comment $comment = null , EntityManagerInterface $entityManager): Response
     {
          // check if $comment doesn't exist
         if (!$comment) {
@@ -143,9 +143,9 @@ class CommentController extends AbstractController
                 );
         }
         // delete 
-        $manager->remove($comment);
+        $entityManager->remove($comment);
         // record in database
-        $manager->flush();
+        $entityManager->flush();
 
         return $this->json(['message' => 'delete successful', 200]);
        
