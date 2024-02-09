@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MyObject index{% endblock %}
+
+{% block body %}
+    <h1>MyObject index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Title</th>
+                <th>Image</th>
+                <th>Description</th>
+                <th>State</th>
+                <th>Created_at</th>
+                <th>Updated_at</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for my_object in my_objects %}
+            <tr>
+                <td>{{ my_object.id }}</td>
+                <td>{{ my_object.name }}</td>
+                <td>{{ my_object.title }}</td>
+                <td>{{ my_object.image }}</td>
+                <td>{{ my_object.description }}</td>
+                <td>{{ my_object.state }}</td>
+                <td>{{ my_object.createdAt ? my_object.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ my_object.updatedAt ? my_object.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_back_my_object_show', {'id': my_object.id}) }}">show</a>
+                    <a href="{{ path('app_back_my_object_edit', {'id': my_object.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_back_my_object_new') }}">Create new</a>
+{% endblock %}
