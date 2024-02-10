@@ -3,14 +3,26 @@
 {% block title %}Category index{% endblock %}
 
 {% block body %}
-    <h1>Category index</h1>
+    
+    {% if app.request.attributes.get('_route') == 'app_back_category_index' %}
+        <h1>Category index</h1>
+        <a href="{{ path('app_back_category_relation_index') }}">Category relation</a>
+    {% elseif app.request.attributes.get('_route') == 'app_back_category_relation_index' %}
+        <h1>Category relation</h1>
+        <a href="{{ path('app_back_category_index') }}">Category index</a>
+    {% endif %}
 
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
+                {% if app.request.attributes.get('_route') == 'app_back_category_index' %}
                 <th>Name</th>
                 <th>Image</th>
+                {% elseif app.request.attributes.get('_route') == 'app_back_category_relation_index' %}
+                <th>Catégory Source</th>
+                <th>Catégory Target</th>
+                {% endif %}
                 <th>actions</th>
             </tr>
         </thead>
@@ -18,8 +30,13 @@
         {% for category in categories %}
             <tr>
                 <td>{{ category.id }}</td>
+                 {% if app.request.attributes.get('_route') == 'app_back_category_index' %}
                 <td>{{ category.name }}</td>
                 <td>{{ category.image }}</td>
+                {% elseif app.request.attributes.get('_route') == 'app_back_category_relation_index' %}
+                <td>{{ category.category_source }}</td>
+                <td>{{ category.category_target }}</td>
+                {% endif %}
                 <td>
                     <a href="{{ path('app_back_category_show', {'id': category.id}) }}">show</a>
                     <a href="{{ path('app_back_category_edit', {'id': category.id}) }}">edit</a>
