@@ -21,7 +21,7 @@ class CategoryController extends AbstractController
             'categories' => $categoryRepository->findAll(),
         ]);
     }
-    #[Route('/relation', name: 'app_back_category_relation_index', methods: ['GET'])]
+    #[Route('/relation', name: 'app_back_category_relation', methods: ['GET'])]
     public function indexRelation(CategoryRepository $categoryRepository): Response
     {
         return $this->render('back/category/index.html.twig', [
