@@ -3,7 +3,10 @@
 {% block title %}MyCollection{% endblock %}
 
 {% block body %}
+<div class="container my-4">
     <h1>MyCollection</h1>
+
+    <a href="{{ path('app_back_my_collection_index') }}"class="btn btn-outline-primary float-end">back to list</a>
 
     <table class="table">
         <tbody>
@@ -42,9 +45,8 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_back_my_collection_index') }}">back to list</a>
 
-    <a href="{{ path('app_back_my_collection_edit', {'id': my_collection.id}) }}">edit</a>
+    <a href="{{ path('app_back_my_collection_edit', {'id': my_collection.id}) }}"class="btn btn-warning">edit</a>
 
     {{ include('back/my_collection/_delete_form.html.twig') }}
 {% endblock %}

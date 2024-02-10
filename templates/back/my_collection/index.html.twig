@@ -3,18 +3,18 @@
 {% block title %}MyCollection index{% endblock %}
 
 {% block body %}
+<div class="container my-4">
     <h1>MyCollection index</h1>
 
-    <table class="table">
+    <a href="{{ path('app_back_my_collection_new') }}"class="btn btn-success float-end">Create new</a>
+
+    <table class="table table-hover mt-4">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Name</th>
                 <th>Image</th>
                 <th>Description</th>
-                <th>Rating</th>
-                <th>Created_at</th>
-                <th>Updated_at</th>
                 <th>Is_active</th>
                 <th>actions</th>
             </tr>
@@ -25,14 +25,11 @@
                 <td>{{ my_collection.id }}</td>
                 <td>{{ my_collection.name }}</td>
                 <td>{{ my_collection.image }}</td>
-                <td>{{ my_collection.description }}</td>
-                <td>{{ my_collection.rating }}</td>
-                <td>{{ my_collection.createdAt ? my_collection.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ my_collection.updatedAt ? my_collection.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ my_collection.description|slice(0, 50) }}... </td>
                 <td>{{ my_collection.isActive ? 'Yes' : 'No' }}</td>
                 <td>
-                    <a href="{{ path('app_back_my_collection_show', {'id': my_collection.id}) }}">show</a>
-                    <a href="{{ path('app_back_my_collection_edit', {'id': my_collection.id}) }}">edit</a>
+                    <a href="{{ path('app_back_my_collection_show', {'id': my_collection.id}) }}"class="btn btn-sm btn-info">show</a>
+                    <a href="{{ path('app_back_my_collection_edit', {'id': my_collection.id}) }}"class="btn btn-sm btn-warning">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -42,6 +39,4 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_back_my_collection_new') }}">Create new</a>
 {% endblock %}
