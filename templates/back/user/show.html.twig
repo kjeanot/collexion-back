@@ -3,9 +3,11 @@
 {% block title %}User{% endblock %}
 
 {% block body %}
+<div class="container my-4">
     <h1>User</h1>
+    <a href="{{ path('app_back_user_index') }}"class="btn btn-outline-primary float-end">back to list</a>
 
-    <table class="table">
+    <table class="table table-hover mt-4">
         <tbody>
             <tr>
                 <th>Id</th>
@@ -38,9 +40,7 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_back_user_index') }}">back to list</a>
-
-    <a href="{{ path('app_back_user_edit', {'id': user.id}) }}">edit</a>
+    <a href="{{ path('app_back_user_edit', {'id': user.id}) }}"class="btn btn-warning">edit</a>
 
     {{ include('back/user/_delete_form.html.twig') }}
 {% endblock %}
