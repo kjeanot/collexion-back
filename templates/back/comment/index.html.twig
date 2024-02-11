@@ -3,13 +3,17 @@
 {% block title %}Comment index{% endblock %}
 
 {% block body %}
+<div class="container my-4">
     <h1>Comment index</h1>
+    <a href="{{ path('app_back_comment_new') }}"class="btn btn-success float-end">Create new</a>
 
-    <table class="table">
+    <table class="table table-hover mt-4">
         <thead>
             <tr>
                 <th>Id</th>
+                <th>User</th>
                 <th>Content</th>
+                 <th>Object</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -17,10 +21,12 @@
         {% for comment in comments %}
             <tr>
                 <td>{{ comment.id }}</td>
-                <td>{{ comment.content }}</td>
+                <td>{{ comment.user.nickname }}</td>
+                <td>{{ comment.content|slice(0, 50) }}...</td>
+                <td>{{ comment.myobject.name }}</td>
                 <td>
-                    <a href="{{ path('app_back_comment_show', {'id': comment.id}) }}">show</a>
-                    <a href="{{ path('app_back_comment_edit', {'id': comment.id}) }}">edit</a>
+                    <a href="{{ path('app_back_comment_show', {'id': comment.id}) }}"class="btn btn-sm btn-info">show</a>
+                    <a href="{{ path('app_back_comment_edit', {'id': comment.id}) }}"class="btn btn-sm btn-warning">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -31,5 +37,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_back_comment_new') }}">Create new</a>
+    </div>
 {% endblock %}
