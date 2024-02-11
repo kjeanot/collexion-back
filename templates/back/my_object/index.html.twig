@@ -3,9 +3,11 @@
 {% block title %}MyObject index{% endblock %}
 
 {% block body %}
+<div class="container my-4">
     <h1>MyObject index</h1>
+    <a href="{{ path('app_back_my_object_new') }}"class="btn btn-success float-end">Create new</a>
 
-    <table class="table">
+    <table class="table table-hover mt-4">
         <thead>
             <tr>
                 <th>Id</th>
@@ -14,8 +16,6 @@
                 <th>Image</th>
                 <th>Description</th>
                 <th>State</th>
-                <th>Created_at</th>
-                <th>Updated_at</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -26,13 +26,11 @@
                 <td>{{ my_object.name }}</td>
                 <td>{{ my_object.title }}</td>
                 <td>{{ my_object.image }}</td>
-                <td>{{ my_object.description }}</td>
+                <td>{{ my_object.description|slice(0, 50) }}...</td>
                 <td>{{ my_object.state }}</td>
-                <td>{{ my_object.createdAt ? my_object.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ my_object.updatedAt ? my_object.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
-                    <a href="{{ path('app_back_my_object_show', {'id': my_object.id}) }}">show</a>
-                    <a href="{{ path('app_back_my_object_edit', {'id': my_object.id}) }}">edit</a>
+                    <a href="{{ path('app_back_my_object_show', {'id': my_object.id}) }}"class="btn btn-sm btn-info">show</a>
+                    <a href="{{ path('app_back_my_object_edit', {'id': my_object.id}) }}"class="btn btn-sm btn-warning">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -43,5 +41,6 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_back_my_object_new') }}">Create new</a>
+    
+</div>
 {% endblock %}

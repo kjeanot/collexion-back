@@ -20,6 +20,7 @@ class CategoryType extends AbstractType
                 'class' => Category::class,
                 'choice_label' => 'name',
                 'multiple' => true,
+                'required' => false,
             ])
         ;
     }

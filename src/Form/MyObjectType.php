@@ -20,16 +20,14 @@ class MyObjectType extends AbstractType
             ->add('image')
             ->add('description')
             ->add('state')
-            ->add('created_at')
-            ->add('updated_at')
             ->add('myCollections', EntityType::class, [
                 'class' => MyCollection::class,
-'choice_label' => 'id',
-'multiple' => true,
+                'choice_label' => 'name',
+                'multiple' => true,
             ])
             ->add('category', EntityType::class, [
                 'class' => Category::class,
-'choice_label' => 'id',
+                'choice_label' => 'name',
             ])
         ;
     }
