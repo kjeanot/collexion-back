@@ -45,4 +45,37 @@ class MyCollectionRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    // SERT DANS LA ROUTE RANDOM => A FAIRE
+    public function getRandomMovie()
+        {
+            $sql = "SELECT * FROM my_collection
+            ORDER BY RAND()
+            LIMIT 1";
+            $conn = $this->getEntityManager()->getConnection();
+            $resultSet = $conn->executeQuery($sql);
+
+            // returns an array of arrays (i.e. a raw data set)
+            return $resultSet->fetchAssociative();
+        }
+
+    /*
+    public function getRandomMovieDql()
+    {
+        // step 1 : call EntityMAnager
+        $manager = $this->getEntityManager();
+        // step 2 : on build SQL query
+        $query = $manager->createQuery(
+            'SELECT m
+            FROM App\Entity\MyCollection AS m
+            ORDER BY RAND()'
+        )->setMaxResults(1);
+
+        // step 3 : execute the sql query and return the result
+        return $query->getResult();
+    
+    }
+    */
+
 }
+
+
