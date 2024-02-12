@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit MyCollection{% endblock %}
+
+{% block body %}
+<div class="container my-4">
+    <h1>Edit MyCollection</h1>
+
+      <a href="{{ path('app_back_my_collection_index') }}"class="btn btn-outline-primary float-end">back to list</a>
+
+    {{ include('back/my_collection/_form.html.twig', {'button_label': 'Update'}) }}
+
+    {{ include('back/my_collection/_delete_form.html.twig') }}
+</div>
+{% endblock %}
