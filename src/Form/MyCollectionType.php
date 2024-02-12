@@ -18,7 +18,6 @@ class MyCollectionType extends AbstractType
             ->add('name')
             ->add('image')
             ->add('description')
-
             ->add('is_active')
             ->add('user', EntityType::class, [
                 'label' => 'User assignment',
@@ -30,22 +29,6 @@ class MyCollectionType extends AbstractType
                 'class' => MyObject::class,
                 'choice_label' => 'name',
                 'multiple' => true,
-            ])
-            ->add('rating')
-            ->add('user', EntityType::class, [
-                'class' => User::class,
-'choice_label' => 'id',
-            ])
-            ->add('users', EntityType::class, [
-                'class' => User::class,
-'choice_label' => 'id',
-'multiple' => true,
-            ])
-            ->add('myobjects', EntityType::class, [
-                'class' => MyObject::class,
-'choice_label' => 'id',
-'multiple' => true,
-
             ])
         ;
     }
