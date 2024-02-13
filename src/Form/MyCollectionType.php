@@ -30,22 +30,6 @@ class MyCollectionType extends AbstractType
                 'choice_label' => 'name',
                 'multiple' => true,
             ])
-            ->add('rating')
-            ->add('user', EntityType::class, [
-                'class' => User::class,
-'choice_label' => 'id',
-            ])
-            ->add('users', EntityType::class, [
-                'class' => User::class,
-'choice_label' => 'id',
-'multiple' => true,
-            ])
-            ->add('myobjects', EntityType::class, [
-                'class' => MyObject::class,
-'choice_label' => 'id',
-'multiple' => true,
-
-            ])
         ;
     }
 
