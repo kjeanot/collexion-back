@@ -16,27 +16,27 @@ class MyObject
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['get_objects','get_collections'])]
+    #[Groups(['get_objects','get_collections','object'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_objects','get_collections'])]
+    #[Groups(['get_objects','get_collections','object'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_objects'])]
+    #[Groups(['get_objects','object'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 2083)]
-    #[Groups(['get_objects','get_collections'])]
+    #[Groups(['get_objects','get_collections','object'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['get_objects'])]
+    #[Groups(['get_objects','object'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_objects'])]
+    #[Groups(['get_objects','object'])]
     private ?string $state = null;
 
     #[ORM\ManyToMany(targetEntity: MyCollection::class, mappedBy: 'myobjects')]

@@ -105,6 +105,7 @@ class MyCollectionController extends AbstractController
         return $this->json([$violations,500,['message' => 'error']]); ;
     } else{
         $myCollection->setUser($security->getUser());
+        
         $entityManager->persist($myCollection);
         $entityManager->flush();
 
