@@ -15,23 +15,23 @@ class MyCollection
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['get_collections'])]
+    #[Groups(['get_collections', 'collection'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_collections'])]
+    #[Groups(['get_collections','collection'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 2083)]
-    #[Groups(['get_collections'])]
+    #[Groups(['get_collections','collection'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['get_collections'])]
+    #[Groups(['get_collections','collection'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['get_collections'])]
+    #[Groups(['get_collections','collection'])]
     private ?float $rating = null;
 
     #[ORM\ManyToOne(inversedBy: 'mycollections')]

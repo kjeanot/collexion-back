@@ -12,6 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validation;
 
 // root URL for all routes from MyCollectionController
 #[Route('/api')]
@@ -88,24 +93,24 @@ class MyCollectionController extends AbstractController
     * @return Response
     */
    #[Route('/collection/create', name: 'api_my_collection_create',methods: ['POST'])]
-   public function create(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository)
+   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGenerator, Security $security)
    {
 
-    // retrieve user
-    $user = $userRepository->find(5);
+    $myCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
 
-       $collection = new MyCollection();
-       $collection->setUser($user);
-       $collection->setName("Name");
-       $collection->setImage("Image");
-       $collection->setDescription("Description");
-       $collection->setRating(3);
+    $validator = Validation::createValidator();
+    $violations = $validator->validate($myCollection);
 
-       $entityManager->persist($collection);
-       $entityManager->flush();
-       return $this->json([201, ['message' => 'create successful']]);
+    if (0 !== count($violations)) {
+        return $this->json([$violations,500,['message' => 'error']]); ;
+    } else{
+        $myCollection->setUser($security->getUser());
+        $entityManager->persist($myCollection);
+        $entityManager->flush();
 
+        return $this->json($serializer->serialize($myCollection, 'json', ['groups' => 'collection']), 201, ['message' => 'create successful']);
    }
+}
 
     /**
     * update one collection
@@ -114,7 +119,7 @@ class MyCollectionController extends AbstractController
     * @return Response
     */
     #[Route('/collection/update/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
-    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager): Response
+    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer , Request $request, Security $security): Response
     {
         // check if $myCollection doesn't exist
         if (!$myCollection) {
@@ -124,14 +129,25 @@ class MyCollectionController extends AbstractController
                 404
             );
         }
- 
-        $myCollection->setName("hrthsrths");
-        $myCollection->setImage("hsrthsrth");
-        $myCollection->setDescription("thsrthsrthszrth");
-        $myCollection->setRating(5);
-        $entityManager->flush();
- 
-        return $this->json(['message' => 'updated successful', 200]);
+
+        $updateMyCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
+
+        $validator = Validation::createValidator();
+        $violations = $validator->validate($myCollection);
+
+        if (0 !== count($violations)) {
+            return $this->json([$violations,500,['message' => 'error']]); ;
+        } else{
+            $myCollection->setUser($security->getUser());
+            $myCollection->setName($updateMyCollection->getName());
+            $myCollection->setDescription($updateMyCollection->getDescription());
+            $myCollection->setImage($updateMyCollection->getImage());
+            $myCollection->setRating($updateMyCollection->getRating());
+
+            $entityManager->flush();
+
+            return $this->json($serializer->serialize($myCollection, 'json', ['groups' => 'collection']), 200, ['message' => 'update successful']);
+        }
  
     }
 
@@ -158,18 +174,4 @@ class MyCollectionController extends AbstractController
         return $this->json(['message' => 'delete successful', 200]);
        
     }
-    
-    // #[Route('/collection/random', name: 'api_my_collection_random', methods: ['GET'])]
-    // public function random(MyCollectionRepository $myCollectionRepository)
-    // {
-    //     // retrieve a random collection
-    //     $collection = $myCollectionRepository->getRandomMovie();
-    //     return $this->json(
-    //         $collection,
-    //         200,
-    //         [],
-    //         ['groups' => ['get_collections']]
-    //     );
-    // }
-    
 }
