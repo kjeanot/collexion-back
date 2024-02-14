@@ -10,9 +10,12 @@ use App\Repository\MyCollectionRepository;
 use App\Repository\MyObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validation;
 
 // all comment avialable on MyCollectionController
 #[Route('/api')]
@@ -75,27 +78,32 @@ class MyObjectController extends AbstractController
     * @return Response
     */
    #[Route('/object/create', name: 'api_my_object_create',methods: ['POST'])]
-   public function create(Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, MyCollectionRepository $myCollectionRepository)
+   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, Category $category = null, CategoryRepository $categoryRepository)
    {
 
-    $category = $categoryRepository->find(20);
-    $collection = $myCollectionRepository->find(13);
+    $jsonData = json_decode($request->getContent(), true);
+    
+    $myObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
 
-    $object = new MyObject();
-    $object->setCategory($category);
-    $object->setName('Object test api ');
-    $object->setTitle('Test api ');
-    $object->setImage('https://via.placeholder.com/150');
-    $object->setDescription('Description test api ');
-    $object->setState('State test api ');
-    $collection->addMyobject($object);
+    $categoryId = $jsonData['category'];
+    $category = $categoryRepository->find($categoryId);
 
-    $entityManager->persist($object);
-    $entityManager->persist($collection);
-    $entityManager->flush();
+    if (!$category) {
+        return $this->json(['message' => 'Category not found'], 404);
+    }
 
-    return $this->json([201, ['message' => 'create successful']]);
+    $validator = Validation::createValidator();
+    $violations = $validator->validate($myObject);
 
+    if (0 !== count($violations)) {
+        return $this->json([$violations, 500, ['message' => 'error']]);
+    } else {
+        $myObject->setCategory($category);
+        $entityManager->persist($myObject);
+        $entityManager->flush();
+
+        return $this->json($serializer->serialize($myObject, 'json', ['groups' => 'object']), 201, ['message' => 'create successful']);
+    }
    }
 
     /**
@@ -105,35 +113,52 @@ class MyObjectController extends AbstractController
     * @return Response
     */
     #[Route('/object/update/{id}', name: 'api_my_object_update',methods: ['PUT'])]
-    public function update(MyObject $object = null, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository): Response
+    public function update(MyObject $myObject = null, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, SerializerInterface $serializer , Request $request): Response
     {
-        if (!$object) {
+        if (!$myObject) {
             return $this->json(
                 "Error : Collection inexistante",
                 404
             );
         }
 
-        $category = $categoryRepository->find(15);
- 
-        $object->setCategory($category);
-        $object->setName('Object je re test api ');
-        $object->setTitle('Test je re api ');
-        $object->setImage('https://via.placeholder.com/150');
-        $object->setDescription('Description je re test api ');
-        $object->setState('State je re test api ');
-        $entityManager->flush();
- 
-        return $this->json(['message' => 'updated successful', 200]);
- 
+        $jsonData = json_decode($request->getContent(), true);
+
+        $updateMyObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
+
+        $categoryId = $jsonData['category'];
+        $updateCategory = $categoryRepository->find($categoryId);
+
+        if (!$updateCategory) {
+            return $this->json(['message' => 'Category not found'], 404);
+        }
+
+        $validator = Validation::createValidator();
+        $violations = $validator->validate($updateMyObject);
+
+        if (0 !== count($violations)) {
+            return $this->json([$violations,500,['message' => 'error']]); ;
+        } else{
+            $myObject->setCategory($updateCategory);
+            $myObject->setName($updateMyObject->getName());
+            $myObject->setTitle($updateMyObject->getTitle());
+            $myObject->setDescription($updateMyObject->getDescription());
+            $myObject->setImage($updateMyObject->getImage());
+            $myObject->setState($updateMyObject->getState());
+
+            $entityManager->flush();
+
+            return $this->json($serializer->serialize($myObject, 'json', ['groups' => 'object']), 200, ['message' => 'update successful']);
+        }
     }
+    
     /**
     * delete one object
     * 
     * @param MyObjectRepository $myObjectRepository
     * @return Response
     */
-    #[Route('/object/delete/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
+    #[Route('/object/delete/{id}', name: 'api_my_object_delete', methods: ['DELETE'])]
     public function delete(MyObject $Object, EntityManagerInterface $manager): Response
     {
         if (!$Object) {

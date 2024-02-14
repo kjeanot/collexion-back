@@ -13,11 +13,11 @@ class Comment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['get_comments'])]
+    #[Groups(['get_comments', 'comment'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['get_comments'])]
+    #[Groups(['get_comments', 'comment'])]
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]

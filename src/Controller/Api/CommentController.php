@@ -12,6 +12,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Validation;
+use Symfony\Bundle\SecurityBundle\Security;
 
 // all comment avialable on MyCollectionController
 #[Route('/api')]
@@ -74,23 +78,32 @@ class CommentController extends AbstractController
     * @return Response
     */
     #[Route('/comment/create', name: 'api_my_comment_create',methods: ['POST'])]
-    public function create(EntityManagerInterface $entityManager, UserRepository $userRepository, MyObjectRepository $myObjectRepository)
+    public function create(EntityManagerInterface $entityManager, UserRepository $userRepository, MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, Security $security)
     {
-        // retrieve user
-        $user = $userRepository->find(3);
-        // retrieve object
-        $object = $myObjectRepository->find(10);
+    $jsonData = json_decode($request->getContent(), true);
+    $comment = $serializer->deserialize($request->getContent(), Comment::class, 'json');
 
-        // set datas
-        $comment = new Comment();
-        $comment->setContent("Content");
-        $comment->setUser($user);
-        $comment->setMyObject($object);
- 
-        // record in database
+    $myObjectId = $jsonData['object'];
+    $myObject = $myObjectRepository->find($myObjectId);
+
+    if (!$myObject) {
+        return $this->json(['message' => 'Object not found'], 404);
+    }
+
+    $validator = Validation::createValidator();
+    $violations = $validator->validate($comment);
+
+    if (0 !== count($violations)) {
+        return $this->json([$violations,500,['message' => 'error']]); ;
+    } else{
+        $comment->setUser($security->getUser());
+        $comment->setMyObject($myObject);
         $entityManager->persist($comment);
         $entityManager->flush();
-        return $this->json([201, ['message' => 'create successful']]);
+
+        return $this->json($serializer->serialize($comment, 'json', ['groups' => 'comment']), 201, ['message' => 'create successful']);
+   }
+
 
     }
 
@@ -101,7 +114,7 @@ class CommentController extends AbstractController
     * @return Response
     */
     #[Route('/comment/update/{id}', name: 'api_my_comment_update',methods: ['PUT'])]
-    public function update(Comment $comment = null, EntityManagerInterface $entityManager, UserRepository $userRepository, MyObjectRepository $myObjectRepository): Response
+    public function update(Comment $comment = null, EntityManagerInterface $entityManager,MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, Security $security): Response
     {
         // check if $comment doesn't exist
         if (!$comment) {
@@ -111,18 +124,32 @@ class CommentController extends AbstractController
                 404
             );
         }
-        // retrieve 1 user
-        $user = $userRepository->find(1);
-        // retrieve 1 object
-        $object = $myObjectRepository->find(5);
-        // set 
-        $comment->setContent("rftjhdyjdhjdtygkcgh");
-        $comment->setUser($user);
-        $comment->setMyObject($object);
-        // record on database
-        $entityManager->flush();
- 
-        return $this->json(['message' => 'updated successful', 200]);
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $updateComment = $serializer->deserialize($request->getContent(), Comment::class, 'json');
+
+        $myObjectId = $jsonData['object'];
+        $updateMyObject = $myObjectRepository->find($myObjectId);
+
+        if (!$updateMyObject) {
+            return $this->json(['message' => 'Object not found'], 404);
+        }
+
+        $validator = Validation::createValidator();
+        $violations = $validator->validate($updateComment);
+
+        if (0 !== count($violations)) {
+            return $this->json([$violations,500,['message' => 'error']]); ;
+        } else{
+            $comment->setUser($security->getUser());
+            $comment->setMyObject($updateMyObject);
+            $comment->setContent($updateComment->getContent());
+
+            $entityManager->flush();
+
+            return $this->json($serializer->serialize($comment, 'json', ['groups' => 'comment']), 200, ['message' => 'update successful']);
+        }
  
     }
 
