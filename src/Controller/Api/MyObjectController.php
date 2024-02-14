@@ -78,13 +78,15 @@ class MyObjectController extends AbstractController
     * @return Response
     */
    #[Route('/object/create', name: 'api_my_object_create',methods: ['POST'])]
-   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, CategoryRepository $categoryRepository)
+   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, Category $category = null, CategoryRepository $categoryRepository)
    {
 
+    $jsonData = json_decode($request->getContent(), true);
+    
     $myObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
 
-    $category = $myObject->getCategory();
-    // $category = $categoryRepository->find($myObject->getCategory()->getId());
+    $categoryId = $jsonData['category'];
+    $category = $categoryRepository->find($categoryId);
 
     if (!$category) {
         return $this->json(['message' => 'Category not found'], 404);
@@ -94,8 +96,8 @@ class MyObjectController extends AbstractController
     $violations = $validator->validate($myObject);
 
     if (0 !== count($violations)) {
-        return $this->json([$violations,500,['message' => 'error']]); ;
-    } else{
+        return $this->json([$violations, 500, ['message' => 'error']]);
+    } else {
         $myObject->setCategory($category);
         $entityManager->persist($myObject);
         $entityManager->flush();
@@ -120,15 +122,24 @@ class MyObjectController extends AbstractController
             );
         }
 
+        $jsonData = json_decode($request->getContent(), true);
+
         $updateMyObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
 
+        $categoryId = $jsonData['category'];
+        $updateCategory = $categoryRepository->find($categoryId);
+
+        if (!$updateCategory) {
+            return $this->json(['message' => 'Category not found'], 404);
+        }
+
         $validator = Validation::createValidator();
-        $violations = $validator->validate($myObject);
+        $violations = $validator->validate($updateMyObject);
 
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
         } else{
-            $myObject->setCategory($updateMyObject->getCategory());
+            $myObject->setCategory($updateCategory);
             $myObject->setName($updateMyObject->getName());
             $myObject->setTitle($updateMyObject->getTitle());
             $myObject->setDescription($updateMyObject->getDescription());
@@ -140,13 +151,14 @@ class MyObjectController extends AbstractController
             return $this->json($serializer->serialize($myObject, 'json', ['groups' => 'object']), 200, ['message' => 'update successful']);
         }
     }
+    
     /**
     * delete one object
     * 
     * @param MyObjectRepository $myObjectRepository
     * @return Response
     */
-    #[Route('/object/delete/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
+    #[Route('/object/delete/{id}', name: 'api_my_object_delete', methods: ['DELETE'])]
     public function delete(MyObject $Object, EntityManagerInterface $manager): Response
     {
         if (!$Object) {

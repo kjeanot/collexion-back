@@ -134,7 +134,7 @@ class MyCollectionController extends AbstractController
         $updateMyCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
 
         $validator = Validation::createValidator();
-        $violations = $validator->validate($myCollection);
+        $violations = $validator->validate($updateMyCollection);
 
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
@@ -159,7 +159,7 @@ class MyCollectionController extends AbstractController
     * @return Response
     */
     #[Route('/collection/delete/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
-    public function delete(MyCollection $myCollection = null, EntityManagerInterface $manager): Response
+    public function delete(MyCollection $myCollection, EntityManagerInterface $manager): Response
     {
          // check if $myCollection doesn't exist
         if (!$myCollection) {

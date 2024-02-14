@@ -80,8 +80,15 @@ class CommentController extends AbstractController
     #[Route('/comment/create', name: 'api_my_comment_create',methods: ['POST'])]
     public function create(EntityManagerInterface $entityManager, UserRepository $userRepository, MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, Security $security)
     {
-
+    $jsonData = json_decode($request->getContent(), true);
     $comment = $serializer->deserialize($request->getContent(), Comment::class, 'json');
+
+    $myObjectId = $jsonData['object'];
+    $myObject = $myObjectRepository->find($myObjectId);
+
+    if (!$myObject) {
+        return $this->json(['message' => 'Object not found'], 404);
+    }
 
     $validator = Validation::createValidator();
     $violations = $validator->validate($comment);
@@ -90,7 +97,7 @@ class CommentController extends AbstractController
         return $this->json([$violations,500,['message' => 'error']]); ;
     } else{
         $comment->setUser($security->getUser());
-        $comment->setMyObject($comment->getMyObject());
+        $comment->setMyObject($myObject);
         $entityManager->persist($comment);
         $entityManager->flush();
 
@@ -107,7 +114,7 @@ class CommentController extends AbstractController
     * @return Response
     */
     #[Route('/comment/update/{id}', name: 'api_my_comment_update',methods: ['PUT'])]
-    public function update(Comment $comment = null, EntityManagerInterface $entityManager, UserRepository $userRepository, MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, Security $security): Response
+    public function update(Comment $comment = null, EntityManagerInterface $entityManager,MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, Security $security): Response
     {
         // check if $comment doesn't exist
         if (!$comment) {
@@ -118,22 +125,30 @@ class CommentController extends AbstractController
             );
         }
 
-        $comment = $serializer->deserialize($request->getContent(), Comment::class, 'json');
+        $jsonData = json_decode($request->getContent(), true);
+
+        $updateComment = $serializer->deserialize($request->getContent(), Comment::class, 'json');
+
+        $myObjectId = $jsonData['object'];
+        $updateMyObject = $myObjectRepository->find($myObjectId);
+
+        if (!$updateMyObject) {
+            return $this->json(['message' => 'Object not found'], 404);
+        }
 
         $validator = Validation::createValidator();
-        $violations = $validator->validate($comment);
+        $violations = $validator->validate($updateComment);
 
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
         } else{
             $comment->setUser($security->getUser());
-            $comment->setMyObject($comment->getMyObject());
-            $comment->setContent($comment->getContent());
-            $comment->setDescription($comment->getDescription());
+            $comment->setMyObject($updateMyObject);
+            $comment->setContent($updateComment->getContent());
 
             $entityManager->flush();
 
-            return $this->json($serializer->serialize($comment, 'json', ['groups' => 'collection']), 200, ['message' => 'update successful']);
+            return $this->json($serializer->serialize($comment, 'json', ['groups' => 'comment']), 200, ['message' => 'update successful']);
         }
  
     }
