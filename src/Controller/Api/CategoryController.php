@@ -45,7 +45,7 @@ class CategoryController extends AbstractController
      * @param CategoryRepository $categoryRepository
      * @return Response
      */
-    #[Route('/category/{id}', name: 'api_my_category_show',methods: ['GET'])]
+    #[Route('/category/{id}', name: 'api_category_show',methods: ['GET'])]
     public function show(Category $category): Response
     {
         if (!$category) {
