@@ -174,4 +174,31 @@ class MyCollectionController extends AbstractController
         return $this->json(['message' => 'delete successful', 200]);
        
     }
+    #[Route('/collection_random', name: 'api_my_collection_random',methods: ['GET'])]
+    public function random(MyCollectionRepository $myCollectionRepository): Response
+    {
+        // retrieve all collections
+        $collections = $myCollectionRepository->findRandomCollectionSql();
+        
+        // check if $myCollection doesn't exist
+        if (!$collections) {
+            return $this->json(
+                "Error : Collection inexistante",
+                // status code
+                404
+            );
+        }
+
+        // return json
+        return $this->json(
+            // what I want to show
+            $collections,
+            // status code
+            200,
+            // header
+            ['Access-Control-Allow-Origin' => '*' ],
+            // groups authorized
+            ['groups' => 'get_collections']
+        );
+    }
 }
