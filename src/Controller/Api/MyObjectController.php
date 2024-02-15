@@ -3,10 +3,8 @@
 namespace App\Controller\Api;
 
 use App\Entity\Category;
-use App\Entity\MyCollection;
 use App\Entity\MyObject;
 use App\Repository\CategoryRepository;
-use App\Repository\MyCollectionRepository;
 use App\Repository\MyObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -172,5 +170,33 @@ class MyObjectController extends AbstractController
 
         return $this->json(['message' => 'delete successful', 200]);
        
+    }
+
+    #[Route('/object_random', name: 'api_my_object_random',methods: ['GET'])]
+    public function random(MyObjectRepository $myObjectRepository): Response
+    {
+        // retrieve all collections
+        $objectRandom = $myObjectRepository->findRandomObjectSql();
+        
+        // check if $myCollection doesn't exist
+        if (!$objectRandom) {
+            return $this->json(
+                "Error : Objet inexistant",
+                // status code
+                404
+            );
+        }
+
+        // return json
+        return $this->json(
+            // what I want to show
+            $objectRandom,
+            // status code
+            200,
+            // header
+            ['Access-Control-Allow-Origin' => '*' ],
+            // groups authorized
+            ['groups' => 'get_objects']
+        );
     }
 }

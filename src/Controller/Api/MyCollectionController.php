@@ -3,17 +3,12 @@
 namespace App\Controller\Api;
 
 use App\Entity\MyCollection;
-use App\Entity\User;
-use App\Form\MyCollectionType;
 use App\Repository\MyCollectionRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validation;
 
@@ -103,6 +98,7 @@ class MyCollectionController extends AbstractController
     if (0 !== count($violations)) {
         return $this->json([$violations,500,['message' => 'error']]); ;
     } else{
+        // retrieve user
         $myCollection->setUser($this->getUser());
         
         $entityManager->persist($myCollection);
