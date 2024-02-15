@@ -40,6 +40,7 @@ class MyObject
     private ?string $state = null;
 
     #[ORM\ManyToMany(targetEntity: MyCollection::class, mappedBy: 'myobjects')]
+    #[Groups(['get_objects','object'])]
     private Collection $myCollections;
 
     #[ORM\OneToMany(mappedBy: 'myObject', targetEntity: Comment::class, orphanRemoval: true)]

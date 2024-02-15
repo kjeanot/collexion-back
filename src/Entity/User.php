@@ -19,11 +19,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['get_collections', 'get_users'])]
+    #[Groups(['get_collections', 'get_users','get_objects'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['get_users'])]
+    #[Groups(['get_users','get_objects'])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -37,15 +37,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_collections', 'get_users'])]
+    #[Groups(['get_collections', 'get_users','get_objects'])]
     private ?string $nickname = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['get_users'])]
+    #[Groups(['get_users','get_objects'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 2083, nullable: true)]
-    #[Groups(['get_collections', 'get_users'])]
+    #[Groups(['get_collections', 'get_users','get_objects'])]
     private ?string $picture = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: MyCollection::class, orphanRemoval: true)]

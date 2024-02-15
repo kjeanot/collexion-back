@@ -40,6 +40,7 @@ class MyCollection
     private ?User $user = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'myfavoritescollections')]
+    #[Groups(['get_objects','object'])]
     private Collection $users;
 
     #[ORM\ManyToMany(targetEntity: MyObject::class, inversedBy: 'myCollections')]
