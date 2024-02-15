@@ -83,7 +83,7 @@ class UserController extends AbstractController
      *
      * @return Response
      */
-    #[Route('/user/create', name: 'app_user_create',methods: ['POST'])]
+    #[Route('/user', name: 'app_user_create',methods: ['POST'])]
     public function create(EntityManagerInterface $manager): Response
     {
         $user = new User();
@@ -108,7 +108,7 @@ class UserController extends AbstractController
     * @param UserRepository $userRepository
     * @return Response
     */
-    #[Route('/user/update/{id}', name: 'api_user_update',methods: ['PUT'])]
+    #[Route('/user/{id}', name: 'api_user_update',methods: ['PUT'])]
     public function update(User $user = null, EntityManagerInterface $entityManager): Response
     {
         // check if $user doesn't exist
@@ -140,7 +140,7 @@ class UserController extends AbstractController
     * @param UserRepository $userRepository
     * @return Response
     */
-    #[Route('/user/delete/{id}', name: 'api_my_user_delete', methods: ['DELETE'])]
+    #[Route('/user/{id}', name: 'api_user_delete', methods: ['DELETE'])]
     public function delete(User $user = null , EntityManagerInterface $entityManager): Response
     {
          // check if $user doesn't exist

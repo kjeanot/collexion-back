@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -92,8 +91,8 @@ class MyCollectionController extends AbstractController
     * @param MyCollectionRepository $myCollectionRepository
     * @return Response
     */
-   #[Route('/collection/create', name: 'api_my_collection_create',methods: ['POST'])]
-   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGenerator, Security $security)
+   #[Route('/collection', name: 'api_my_collection_create',methods: ['POST'])]
+   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer)
    {
 
     $myCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
@@ -104,7 +103,7 @@ class MyCollectionController extends AbstractController
     if (0 !== count($violations)) {
         return $this->json([$violations,500,['message' => 'error']]); ;
     } else{
-        $myCollection->setUser($security->getUser());
+        $myCollection->setUser($this->getUser());
         
         $entityManager->persist($myCollection);
         $entityManager->flush();
@@ -119,8 +118,8 @@ class MyCollectionController extends AbstractController
     * @param MyCollectionRepository $myCollectionRepository
     * @return Response
     */
-    #[Route('/collection/update/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
-    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer , Request $request, Security $security): Response
+    #[Route('/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
+    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer , Request $request): Response
     {
         // check if $myCollection doesn't exist
         if (!$myCollection) {
@@ -139,7 +138,7 @@ class MyCollectionController extends AbstractController
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
         } else{
-            $myCollection->setUser($security->getUser());
+            $myCollection->setUser($this->getUser());
             $myCollection->setName($updateMyCollection->getName());
             $myCollection->setDescription($updateMyCollection->getDescription());
             $myCollection->setImage($updateMyCollection->getImage());
@@ -158,7 +157,7 @@ class MyCollectionController extends AbstractController
     * @param MyCollectionRepository $myCollectionRepository
     * @return Response
     */
-    #[Route('/collection/delete/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
+    #[Route('/collection/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
     public function delete(MyCollection $myCollection, EntityManagerInterface $manager): Response
     {
          // check if $myCollection doesn't exist

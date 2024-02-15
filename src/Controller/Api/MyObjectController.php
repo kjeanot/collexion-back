@@ -10,7 +10,6 @@ use App\Repository\MyCollectionRepository;
 use App\Repository\MyObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -29,7 +28,7 @@ class MyObjectController extends AbstractController
      * @return Response
      */
     #[Route('/objects', name: 'api_my_object_list')]
-    public function index(MyObjectRepository $myObjectRepository): Response
+    public function list(MyObjectRepository $myObjectRepository): Response
     {
         $objects = $myObjectRepository->findAll();
         
@@ -77,7 +76,7 @@ class MyObjectController extends AbstractController
     * @param MyObjectRepository $myObjectRepository
     * @return Response
     */
-   #[Route('/object/create', name: 'api_my_object_create',methods: ['POST'])]
+   #[Route('/object', name: 'api_my_object_create',methods: ['POST'])]
    public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, Category $category = null, CategoryRepository $categoryRepository)
    {
 
@@ -112,7 +111,7 @@ class MyObjectController extends AbstractController
     * @param MyObjectRepository $myObjectRepository
     * @return Response
     */
-    #[Route('/object/update/{id}', name: 'api_my_object_update',methods: ['PUT'])]
+    #[Route('/object/{id}', name: 'api_my_object_update',methods: ['PUT'])]
     public function update(MyObject $myObject = null, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, SerializerInterface $serializer , Request $request): Response
     {
         if (!$myObject) {
@@ -158,7 +157,7 @@ class MyObjectController extends AbstractController
     * @param MyObjectRepository $myObjectRepository
     * @return Response
     */
-    #[Route('/object/delete/{id}', name: 'api_my_object_delete', methods: ['DELETE'])]
+    #[Route('/object/{id}', name: 'api_my_object_delete', methods: ['DELETE'])]
     public function delete(MyObject $Object, EntityManagerInterface $manager): Response
     {
         if (!$Object) {
