@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\MyCollection;
 use App\Repository\MyCollectionRepository;
+use App\Repository\MyObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -115,7 +116,7 @@ class MyCollectionController extends AbstractController
     * @return Response
     */
     #[Route('/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
-    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer , Request $request): Response
+    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer , Request $request, MyObjectRepository $myObjectRepository): Response
     {
         // check if $myCollection doesn't exist
         if (!$myCollection) {
@@ -131,7 +132,7 @@ class MyCollectionController extends AbstractController
         $updateMyCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
 
         $myObjectId = $jsonData['myobjects'];
-
+        
         $validator = Validation::createValidator();
         $violations = $validator->validate($updateMyCollection);
 
@@ -142,8 +143,14 @@ class MyCollectionController extends AbstractController
             $myCollection->setName($updateMyCollection->getName());
             $myCollection->setDescription($updateMyCollection->getDescription());
             $myCollection->setImage($updateMyCollection->getImage());
-            $myCollection->setIsActive($updateMyCollection->getIsActive());
-
+            foreach ($myObjectId as $object) {
+                $objectId = $object['id'];
+                $objectToRemove = $myObjectRepository->find($objectId);
+                if ($objectToRemove) {
+                    $myCollection->removeMyobject($objectToRemove);
+                }
+            }
+            
             $entityManager->flush();
 
             return $this->json($serializer->serialize($myCollection, 'json', ['groups' => 'collection']), 200, ['message' => 'update successful']);
