@@ -2,12 +2,9 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\User;
 use App\Entity\Comment;
-use App\Entity\MyObject;
 use App\Repository\CommentRepository;
 use App\Repository\MyObjectRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,7 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Validation;
-use Symfony\Bundle\SecurityBundle\Security;
 
 // all comment avialable on MyCollectionController
 #[Route('/api')]
@@ -78,7 +74,7 @@ class CommentController extends AbstractController
     * @return Response
     */
     #[Route('/comment', name: 'api_comment_create',methods: ['POST'])]
-    public function create(EntityManagerInterface $entityManager, UserRepository $userRepository, MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, Security $security)
+    public function create(EntityManagerInterface $entityManager, MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request)
     {
     $jsonData = json_decode($request->getContent(), true);
     $comment = $serializer->deserialize($request->getContent(), Comment::class, 'json');
@@ -96,7 +92,8 @@ class CommentController extends AbstractController
     if (0 !== count($violations)) {
         return $this->json([$violations,500,['message' => 'error']]); ;
     } else{
-        $comment->setUser($security->getUser());
+        // retrieve user
+        $comment->setUser($this->getUser());
         $comment->setMyObject($myObject);
         $entityManager->persist($comment);
         $entityManager->flush();
@@ -114,7 +111,7 @@ class CommentController extends AbstractController
     * @return Response
     */
     #[Route('/comment/{id}', name: 'api_comment_update',methods: ['PUT'])]
-    public function update(Comment $comment = null, EntityManagerInterface $entityManager,MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, Security $security): Response
+    public function update(Comment $comment = null, EntityManagerInterface $entityManager,MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request): Response
     {
         // check if $comment doesn't exist
         if (!$comment) {
@@ -142,7 +139,7 @@ class CommentController extends AbstractController
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
         } else{
-            $comment->setUser($security->getUser());
+            $comment->setUser($this->getUser());
             $comment->setMyObject($updateMyObject);
             $comment->setContent($updateComment->getContent());
 

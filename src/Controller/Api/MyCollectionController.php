@@ -3,17 +3,12 @@
 namespace App\Controller\Api;
 
 use App\Entity\MyCollection;
-use App\Entity\User;
-use App\Form\MyCollectionType;
 use App\Repository\MyCollectionRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validation;
 
@@ -81,7 +76,7 @@ class MyCollectionController extends AbstractController
             // header
             ['Access-Control-Allow-Origin' => '*' ],
             // groups authorized
-            ['groups' => 'get_collections']
+            ['groups' => 'get_collection']
             );
     } 
     
@@ -103,6 +98,7 @@ class MyCollectionController extends AbstractController
     if (0 !== count($violations)) {
         return $this->json([$violations,500,['message' => 'error']]); ;
     } else{
+        // retrieve user
         $myCollection->setUser($this->getUser());
         
         $entityManager->persist($myCollection);
@@ -146,7 +142,7 @@ class MyCollectionController extends AbstractController
             $myCollection->setName($updateMyCollection->getName());
             $myCollection->setDescription($updateMyCollection->getDescription());
             $myCollection->setImage($updateMyCollection->getImage());
-            $myCollection->setRating($updateMyCollection->getRating());
+            $myCollection->setIsActive($updateMyCollection->getIsActive());
 
             $entityManager->flush();
 
@@ -178,4 +174,56 @@ class MyCollectionController extends AbstractController
         return $this->json(['message' => 'delete successful', 200]);
        
     }
+    #[Route('/collection_random', name: 'api_my_collection_random',methods: ['GET'])]
+    public function random(MyCollectionRepository $myCollectionRepository): Response
+    {
+        // retrieve all collections
+        $collections = $myCollectionRepository->findRandomCollectionSql();
+        
+        // check if $myCollection doesn't exist
+        if (!$collections) {
+            return $this->json(
+                "Error : Collection inexistante",
+                // status code
+                404
+            );
+        }
+
+        // return json
+        return $this->json(
+            // what I want to show
+            $collections,
+            // status code
+            200,
+            // header
+            ['Access-Control-Allow-Origin' => '*' ],
+            // groups authorized
+            ['groups' => 'get_collections']
+        );
+    }
+    // #[Route('/collection_newfavori', name: 'api_my_collection_newfavori',methods: ['POST'])]
+    // public function favori(MyCollectionRepository $myCollectionRepository): Response
+    // {
+    //     // retrieve all collections
+    //     $collections = $myCollectionRepository->findRandomCollectionSql();
+    //     // check if $myCollection doesn't exist
+    //     if (!$collections) {
+    //         return $this->json(
+    //             "Error : Collection inexistante",
+    //             // status code
+    //             404
+    //         );
+    //     }
+    //     // return json
+    //     return $this->json(
+    //         // what I want to show
+    //         $collections,
+    //         // status code
+    //         200,
+    //         // header
+    //         ['Access-Control-Allow-Origin' => '*' ],
+    //         // groups authorized
+    //         ['groups' => 'get_collections']
+    //     );
+    // }
 }

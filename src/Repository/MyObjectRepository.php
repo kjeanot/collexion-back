@@ -35,6 +35,19 @@ class MyObjectRepository extends ServiceEntityRepository
 //            ->getResult()
 //        ;
 //    }
+public function findRandomObjectSql()
+{
+ $conn = $this->getEntityManager()->getConnection();
+
+ $sql = '
+ SELECT *
+ FROM my_object
+ ORDER BY RAND()
+ LIMIT 1
+     ';
+ $resultSet = $conn->executeQuery($sql);
+ return $resultSet->fetchAssociative();
+}
 
 //    public function findOneBySomeField($value): ?MyObject
 //    {

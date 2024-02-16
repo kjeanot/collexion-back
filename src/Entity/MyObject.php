@@ -16,37 +16,40 @@ class MyObject
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['get_objects','get_collections','object'])]
+    #[Groups(['get_objects','get_collections','object','get_object','get_collection'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_objects','get_collections','object'])]
+    #[Groups(['get_objects','get_collections','object','get_object','get_collection'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_objects','object'])]
+    #[Groups(['get_objects','object','get_object'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 2083)]
-    #[Groups(['get_objects','get_collections','object'])]
+    #[Groups(['get_objects','get_collections','object','get_object','get_collection'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['get_objects','object'])]
+    #[Groups(['get_objects','object','get_object'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_objects','object'])]
+    #[Groups(['get_objects','object','get_object'])]
     private ?string $state = null;
 
     #[ORM\ManyToMany(targetEntity: MyCollection::class, mappedBy: 'myobjects')]
+    #[Groups(['get_object'])]
     private Collection $myCollections;
 
     #[ORM\OneToMany(mappedBy: 'myObject', targetEntity: Comment::class, orphanRemoval: true)]
+    #[Groups(['get_object'])]
     private Collection $comments;
 
     #[ORM\ManyToOne(inversedBy: 'objects')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get_object'])]
     private ?Category $category = null;
 
     #[ORM\Column]
