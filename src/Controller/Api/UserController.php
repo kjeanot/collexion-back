@@ -74,7 +74,7 @@ class UserController extends AbstractController
             // header
             ['Access-Control-Allow-Origin' => '*' ],
             // groups authorized
-            ['groups' => 'get_users']
+            ['groups' => 'get_user']
         );
     }
 
@@ -158,4 +158,5 @@ class UserController extends AbstractController
         return $this->json(['message' => 'delete successful', 200]);
        
     }
+    
 }

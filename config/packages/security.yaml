@@ -31,6 +31,9 @@ security:
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\LoginFormAuthenticator
+            json_login:
+                # api_login is a route we will create below
+                check_path: api_login
             logout:
                 path: app_logout
                 # where to redirect after logout
