@@ -130,7 +130,11 @@ class MyCollectionController extends AbstractController
             );
         }
 
+        $jsonData = json_decode($request->getContent(), true);
+
         $updateMyCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
+
+        $myObjectId = $jsonData['myobjects'];
 
         $validator = Validation::createValidator();
         $violations = $validator->validate($updateMyCollection);
