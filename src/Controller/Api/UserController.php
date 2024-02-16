@@ -74,7 +74,7 @@ class UserController extends AbstractController
             // header
             ['Access-Control-Allow-Origin' => '*' ],
             // groups authorized
-            ['groups' => 'get_users']
+            ['groups' => 'get_user']
         );
     }
 

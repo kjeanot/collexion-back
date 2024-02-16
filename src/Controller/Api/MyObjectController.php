@@ -64,7 +64,7 @@ class MyObjectController extends AbstractController
             $myObject,
             200,
             ['Access-Control-Allow-Origin' => '*'],
-            ['groups' => 'get_objects']
+            ['groups' => 'get_object']
             );
     } 
 

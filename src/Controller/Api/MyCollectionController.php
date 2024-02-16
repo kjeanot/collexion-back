@@ -76,7 +76,7 @@ class MyCollectionController extends AbstractController
             // header
             ['Access-Control-Allow-Origin' => '*' ],
             // groups authorized
-            ['groups' => 'get_collections']
+            ['groups' => 'get_collection']
             );
     } 
     
@@ -138,7 +138,7 @@ class MyCollectionController extends AbstractController
             $myCollection->setName($updateMyCollection->getName());
             $myCollection->setDescription($updateMyCollection->getDescription());
             $myCollection->setImage($updateMyCollection->getImage());
-            $myCollection->setRating($updateMyCollection->getRating());
+            $myCollection->setIsActive($updateMyCollection->getIsActive());
 
             $entityManager->flush();
 
@@ -197,4 +197,29 @@ class MyCollectionController extends AbstractController
             ['groups' => 'get_collections']
         );
     }
+    // #[Route('/collection_newfavori', name: 'api_my_collection_newfavori',methods: ['POST'])]
+    // public function favori(MyCollectionRepository $myCollectionRepository): Response
+    // {
+    //     // retrieve all collections
+    //     $collections = $myCollectionRepository->findRandomCollectionSql();
+    //     // check if $myCollection doesn't exist
+    //     if (!$collections) {
+    //         return $this->json(
+    //             "Error : Collection inexistante",
+    //             // status code
+    //             404
+    //         );
+    //     }
+    //     // return json
+    //     return $this->json(
+    //         // what I want to show
+    //         $collections,
+    //         // status code
+    //         200,
+    //         // header
+    //         ['Access-Control-Allow-Origin' => '*' ],
+    //         // groups authorized
+    //         ['groups' => 'get_collections']
+    //     );
+    // }
 }

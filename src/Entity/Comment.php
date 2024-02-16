@@ -13,15 +13,16 @@ class Comment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['get_comments', 'comment'])]
+    #[Groups(['get_comments', 'comment','get_object'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['get_comments', 'comment'])]
+    #[Groups(['get_comments', 'comment','get_object'])]
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get_object'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
