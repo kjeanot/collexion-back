@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\Category;
 use App\Entity\MyObject;
 use App\Repository\CategoryRepository;
+use App\Repository\MyCollectionRepository;
 use App\Repository\MyObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -110,7 +111,7 @@ class MyObjectController extends AbstractController
     * @return Response
     */
     #[Route('/object/{id}', name: 'api_my_object_update',methods: ['PUT'])]
-    public function update(MyObject $myObject = null, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, SerializerInterface $serializer , Request $request): Response
+    public function update(MyObject $myObject = null, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, SerializerInterface $serializer , Request $request, MyCollectionRepository $myCollectionRepository): Response
     {
         if (!$myObject) {
             return $this->json(
@@ -124,6 +125,8 @@ class MyObjectController extends AbstractController
         $updateMyObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
 
         $categoryId = $jsonData['category'];
+        $myCollectionId = $jsonData['mycollections'];
+        
         $updateCategory = $categoryRepository->find($categoryId);
 
         if (!$updateCategory) {
@@ -142,6 +145,14 @@ class MyObjectController extends AbstractController
             $myObject->setDescription($updateMyObject->getDescription());
             $myObject->setImage($updateMyObject->getImage());
             $myObject->setState($updateMyObject->getState());
+            foreach ($myCollectionId as $collection) {
+                $collectionId = $collection['id'];
+               
+                $collectionToAdd = $myCollectionRepository->find($collectionId);
+                if ($collectionToAdd) {
+                    $myObject->addMyCollection($collectionToAdd);
+                }
+            }
 
             $entityManager->flush();
 
