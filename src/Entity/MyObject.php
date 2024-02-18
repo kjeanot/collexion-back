@@ -39,7 +39,7 @@ class MyObject
     #[Groups(['get_objects','object','get_object'])]
     private ?string $state = null;
 
-    #[ORM\ManyToMany(targetEntity: MyCollection::class, mappedBy: 'myobjects')]
+    #[ORM\ManyToMany(targetEntity: MyCollection::class, mappedBy: 'myobjects', cascade: ['persist'])]
     #[Groups(['get_object'])]
     private Collection $myCollections;
 
