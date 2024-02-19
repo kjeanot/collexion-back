@@ -44,11 +44,11 @@ class MyCollection
     private Collection $users;
 
     #[ORM\ManyToMany(targetEntity: MyObject::class, inversedBy: 'myCollections')]
-    #[Groups(['get_collections','get_collection'])]
+    #[Groups(['get_collections','get_collection',])]
     private Collection $myobjects;
 
     #[ORM\Column]
-    #[Groups(['get_collections','get_favorite'])]
+    #[Groups(['get_collections','get_favorite',])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]

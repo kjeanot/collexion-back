@@ -110,10 +110,10 @@ class CategoryController extends AbstractController
         }
 
         return $this->json(
-            $categoriesChilds,
+            $category,
             200,
             ['Access-Control-Allow-Origin' => '*'],
-            ['groups' => 'get_categories']
+            ['groups' => 'get_categorie_childs']
             );
     } 
 

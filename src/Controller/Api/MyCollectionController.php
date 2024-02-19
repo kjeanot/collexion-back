@@ -141,11 +141,11 @@ class MyCollectionController extends AbstractController
             );
         }
 
-        // $jsonData = json_decode($request->getContent(), true);
+        $jsonData = json_decode($request->getContent(), true);
 
         $updateMyCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
 
-        // $myObjectId = $jsonData['myobjects'];
+        $myObjectId = $jsonData['releatedObjects'];
         
         $validator = Validation::createValidator();
         $violations = $validator->validate($updateMyCollection);
@@ -154,16 +154,13 @@ class MyCollectionController extends AbstractController
             return $this->json([$violations,500,['message' => 'error']]); ;
         } else{
             $myCollection->setUser($this->getUser());
-            $myCollection->setName($updateMyCollection->getName());
-            $myCollection->setDescription($updateMyCollection->getDescription());
-            $myCollection->setImage($updateMyCollection->getImage());
-            // foreach ($myObjectId as $object) {
-            //     $objectId = $object['id'];
-            //     $objectToRemove = $myObjectRepository->find($objectId);
-            //     if ($objectToRemove) {
-            //         $myCollection->removeMyobject($objectToRemove);
-            //     }
-            // }
+            foreach ($myObjectId as $object) {
+                $objectId = $object['id'];
+                $objectToRemove = $myObjectRepository->find($objectId);
+                if ($objectToRemove) {
+                    $myCollection->removeMyobject($objectToRemove);
+                }
+            }
             
             $entityManager->flush();
 

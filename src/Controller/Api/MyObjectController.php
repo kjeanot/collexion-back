@@ -80,18 +80,18 @@ class MyObjectController extends AbstractController
    public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, Category $category = null, CategoryRepository $categoryRepository, MyCollectionRepository $myCollectionRepository)
    {
 
-    // $jsonData = json_decode($request->getContent(), true);
+    $jsonData = json_decode($request->getContent(), true);
     
     $myObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
 
-    // $categoryId = $jsonData['category'];
-    // $category = $categoryRepository->find($categoryId);
+    $categoryId = $jsonData['releatedCategory'];
+    $category = $categoryRepository->find($categoryId);
 
-    // if (!$category) {
-    //     return $this->json(['message' => 'Category not found'], 404);
-    // }
+    if (!$category) {
+        return $this->json(['message' => 'Category not found'], 404);
+    }
 
-    // $myCollectionId = $jsonData['mycollectionsa'];
+    $myCollectionId = $jsonData['releatedMyCollections'];
 
     $validator = Validation::createValidator();
     $violations = $validator->validate($myObject);
@@ -99,15 +99,15 @@ class MyObjectController extends AbstractController
     if (0 !== count($violations)) {
         return $this->json([$violations, 500, ['message' => 'error']]);
     } else {
-        // $myObject->setCategory($category);
-        // foreach ($myCollectionId as $collection) {
-        //     $collectionId = $collection['id'];
+        $myObject->setCategory($category);
+        foreach ($myCollectionId as $collection) {
+            $collectionId = $collection['id'];
            
-        //     $collectionToAdd = $myCollectionRepository->find($collectionId);
-        //     if ($collectionToAdd) {
-        //         $myObject->addMyCollection($collectionToAdd);
-        //     }
-        // }
+            $collectionToAdd = $myCollectionRepository->find($collectionId);
+            if ($collectionToAdd) {
+                $myObject->addMyCollection($collectionToAdd);
+            }
+        }
         $entityManager->persist($myObject);
         $entityManager->flush();
 
@@ -131,18 +131,18 @@ class MyObjectController extends AbstractController
             );
         }
 
-        // $jsonData = json_decode($request->getContent(), true);
+        $jsonData = json_decode($request->getContent(), true);
 
         $updateMyObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
 
-        // $categoryId = $jsonData['category'];
-        // $myCollectionId = $jsonData['mycollections'];
+        $categoryId = $jsonData['releatedCategory'];
+        $myCollectionId = $jsonData['releatedMyCollections'];
         
-        // $updateCategory = $categoryRepository->find($categoryId);
+        $updateCategory = $categoryRepository->find($categoryId);
 
-        // if (!$updateCategory) {
-        //     return $this->json(['message' => 'Category not found'], 404);
-        // }
+        if (!$updateCategory) {
+            return $this->json(['message' => 'Category not found'], 404);
+        }
 
         $validator = Validation::createValidator();
         $violations = $validator->validate($updateMyObject);
@@ -150,20 +150,20 @@ class MyObjectController extends AbstractController
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
         } else{
-            // $myObject->setCategory($updateCategory);
+            $myObject->setCategory($updateCategory);
             $myObject->setName($updateMyObject->getName());
             $myObject->setTitle($updateMyObject->getTitle());
             $myObject->setDescription($updateMyObject->getDescription());
             $myObject->setImage($updateMyObject->getImage());
             $myObject->setState($updateMyObject->getState());
-            // foreach ($myCollectionId as $collection) {
-            //     $collectionId = $collection['id'];
+            foreach ($myCollectionId as $collection) {
+                $collectionId = $collection['id'];
                
-            //     $collectionToAdd = $myCollectionRepository->find($collectionId);
-            //     if ($collectionToAdd) {
-            //         $myObject->addMyCollection($collectionToAdd);
-            //     }
-            // }
+                $collectionToAdd = $myCollectionRepository->find($collectionId);
+                if ($collectionToAdd) {
+                    $myObject->addMyCollection($collectionToAdd);
+                }
+            }
 
             $entityManager->flush();
 
