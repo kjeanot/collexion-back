@@ -96,7 +96,7 @@ class CategoryController extends AbstractController
      * @param CategoryRepository $categoryRepository
      * @return Response
      */
-    #[Route('/category/parents/childs/{id}', name: 'api_categories_parents_childs',methods: ['GET'])]
+    #[Route('/category/{id}/childs', name: 'api_categories_parents_childs',methods: ['GET'])]
     public function showChildsById(Category $category, CategoryRepository $categoryRepository): Response
     {
 

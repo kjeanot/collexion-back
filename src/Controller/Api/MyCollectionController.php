@@ -222,16 +222,11 @@ class MyCollectionController extends AbstractController
             ['groups' => 'get_collections']
         );
     }
-    #[Route('/new_favorite', name: 'api_new_collection_favorite',methods: ['POST'])]
-    public function newFavorite(MyCollectionRepository $myCollectionRepository,Request $request, EntityManagerInterface $entityManager ): Response
+    #[Route('/add/{id}/favorite', name: 'api_add_collection_favorite',methods: ['POST'])]
+    public function newFavorite(MyCollection $myCollection, EntityManagerInterface $entityManager,): Response
     {
-        $jsonData = json_decode($request->getContent(), true);
-        $myCollectionId = $jsonData['mycollection'];
         
-        // retrieve all collections
-        $collections = $myCollectionRepository->find($myCollectionId);
-        // check if $myCollection doesn't exist
-        if (!$collections) {
+        if (!$myCollection) {
             return $this->json(
                 "Error : Collection inexistante",
                 // status code
@@ -239,35 +234,33 @@ class MyCollectionController extends AbstractController
             );
         }
 
-        $collections->addUser($this->getUser());
+        $myCollection->addUser($this->getUser());
 
 
-        $entityManager->persist($collections);
+        $entityManager->persist($myCollection);
         $entityManager->flush();
 
         // return json
         return $this->json(
             // what I want to show
-            $collections,
+            $myCollection,
             // status code
             200,
             // header
             ['Access-Control-Allow-Origin' => '*' ],
             // groups authorized
-            ['groups' => 'get_favorite']
+            ['groups' => 'get_favorite'],
+            ['message' => 'add successful']
         );
     }
 
-        #[Route('/delete_favorite', name: 'api_delete_collection_favorite',methods: ['POST'])]
-    public function deleteFavorite(MyCollectionRepository $myCollectionRepository,Request $request, EntityManagerInterface $entityManager): Response
+        #[Route('/delete/{id}/favorite', name: 'api_delete_collection_favorite',methods: ['POST'])]
+    public function deleteFavorite(MyCollection $myCollection, EntityManagerInterface $entityManager): Response
     {
-        $jsonData = json_decode($request->getContent(), true);
 
-        $myCollectionId = $jsonData['mycollection'];
-        // retrieve all collections
-        $collections = $myCollectionRepository->find($myCollectionId);
+
         // check if $myCollection doesn't exist
-        if (!$collections) {
+        if (!$myCollection) {
             return $this->json(
                 "Error : Collection inexistante",
                 // status code
@@ -275,22 +268,23 @@ class MyCollectionController extends AbstractController
             );
         }
 
-        $collections->removeUser($this->getUser());
+        $myCollection->removeUser($this->getUser());
 
 
-        $entityManager->persist($collections);
+        $entityManager->persist($myCollection);
         $entityManager->flush();
 
         // return json
         return $this->json(
             // what I want to show
-            $collections,
+            $myCollection,
             // status code
             200,
             // header
-            ['Access-Control-Allow-Origin' => '*' ],
+            [],
             // groups authorized
-            ['groups' => 'get_favorite']
+            ['groups' => 'get_favorite'],
+            ['message' => 'delete successful']
         );
     }
 }
