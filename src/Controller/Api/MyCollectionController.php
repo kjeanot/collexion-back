@@ -2,20 +2,22 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\MyCollection;
+use Exception;
 use App\Entity\User;
+use App\Entity\MyCollection;
 use App\Form\MyCollectionType;
-use App\Repository\MyCollectionRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\MyCollectionRepository;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 // root URL for all routes from MyCollectionController
 #[Route('/api')]
@@ -173,5 +175,36 @@ class MyCollectionController extends AbstractController
 
         return $this->json(['message' => 'delete successful', 200]);
        
+    }
+
+    /**
+     * @Route("/uploadFile", name="upload", methods={"POST"})
+     */
+    #[Route('/upload_file', name: 'api_upload_file', methods: ['POST'])]
+    public function upload(Request $request, ParameterBagInterface $params, MyCollection $myCollection)
+    {
+        dd($request);
+
+        $image = $request->files->get('file');
+
+        // check if $image exist
+        /* if ($image === null) {
+            throw new Exception("L'objet image est null");
+        } */
+        
+        // enregistrement de l'image dans le dossier public du serveur
+        // paramas->get('public') =>  va chercher dans services.yaml la variable public
+        $image->move($params->get('public'), $image->getClientOriginalName());
+
+				
+        // on ajoute uniqid() afin de ne pas avoir 2 fichiers avec le même nom
+        $newFilename = uniqid().'.'. $image->getClientOriginalName();
+        // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
+				// $entity est l'entity qui doit recevoir votre image
+				$myCollection->setImage($newFilename);
+
+        return $this->json([
+            'message' => 'Image uploaded successfully.'
+        ]);
     }
 }

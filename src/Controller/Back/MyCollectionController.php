@@ -4,12 +4,12 @@ namespace App\Controller\Back;
 
 use App\Entity\MyCollection;
 use App\Form\MyCollectionType;
-use App\Repository\MyCollectionRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\MyCollectionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/back/my/collection')]
 class MyCollectionController extends AbstractController
