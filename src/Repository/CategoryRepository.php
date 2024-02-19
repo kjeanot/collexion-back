@@ -67,6 +67,15 @@ public function  findAllCategoriesChild()
     return $resultSet->fetchAllAssociative();
    }
 
+   public function findAllLimit5()
+   {
+       return $this->createQueryBuilder('c')
+           ->setMaxResults(5)
+           ->getQuery()
+           ->getResult()
+       ;
+   }
+
 //    public function findByExampleField($value): array
 //    {
 //        return $this->createQueryBuilder('c')

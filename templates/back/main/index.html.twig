@@ -1,0 +1,161 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container my-4">
+  <p class="display-4">
+    Bienvenue dans le backOffice 
+  </p>
+  <div class="row mt-5">
+    <div class="col-12 col-md-6">
+      <div class="card text-white mb-3">
+        <div class="card-header bg-primary">Liste des Users</div>
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Titre</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            {% for user in usersLimit %}
+            <tbody>
+                <tr>
+                  <th scope="row">{{user.id}}</th>
+                  <td>{{user.nickname}}</td>
+                </tr>
+            </tbody>
+            {% endfor %}
+          </table>
+          <div class="d-grid gap-2">
+            <a href="{{ path('app_back_user_index') }}" class="btn btn-success">Voir plus</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="card text-white mb-3">
+        <div class="card-header bg-primary">Liste des Collections</div>
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nom</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            {% for myCollection in myCollectionsLimit %}
+            <tbody>
+                <tr>
+                  <th scope="row">{{myCollection.id}}</th>
+                  <td>{{myCollection.name}}</td>
+                </tr>
+            </tbody>
+            {% endfor %}
+          </table>
+          <div class="d-grid gap-2">
+            <a href="{{ path('app_back_my_collection_index') }}" class="btn btn-success">Voir plus</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+
+  <div class="container my-4">
+  <div class="row mt-5">
+    <div class="col-12 col-md-6">
+      <div class="card text-white mb-3">
+        <div class="card-header bg-primary">Liste des Objets</div>
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Titre</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+             {% for myObject in myObjectsLimit %}
+            <tbody>
+                <tr>
+                  <th scope="row">{{myObject.id}}</th>
+                  <td>{{myObject.name}}</td>
+                </tr>
+            </tbody>
+            {% endfor %}
+          </table>
+          <div class="d-grid gap-2">
+            <a href="{{ path('app_back_my_object_index') }}" class="btn btn-success">Voir plus</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="card text-white mb-3">
+        <div class="card-header bg-primary">Liste des Categories</div>
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nom</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+             {% for categorie in categoriesLimit %}
+            <tbody>
+                <tr>
+                  <th scope="row">{{categorie.id}}</th>
+                  <td>{{categorie.name}}</td>
+                </tr>
+            </tbody>
+            {% endfor %}
+          </table>
+          <div class="d-grid gap-2">
+            <a href="{{ path('app_back_category_index') }}" class="btn btn-success">Voir plus</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+
+    <div class="container my-4">
+  <div class="row mt-5">
+    <div class="col-12 col-md-6">
+      <div class="card text-white mb-3">
+        <div class="card-header bg-primary">Liste des Commentaires</div>
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Titre</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            {% for comment in commentsLimit %}
+            <tbody>
+                <tr>
+                  <th scope="row">{{comment.id}}</th>
+                  <td>{{comment.content}}</td>
+                </tr>
+            </tbody>
+            {% endfor %}
+          </table>
+          <div class="d-grid gap-2">
+            <a href="{{ path('app_back_comment_index') }}" class="btn btn-success">Voir plus</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+
+
+{% endblock %}

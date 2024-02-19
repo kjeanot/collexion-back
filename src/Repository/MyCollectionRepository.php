@@ -20,6 +20,14 @@ class MyCollectionRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, MyCollection::class);
     }
+    public function findAllLimit5()
+    {
+        return $this->createQueryBuilder('mc')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
 //    /**
 //     * @return MyCollection[] Returns an array of MyCollection objects
