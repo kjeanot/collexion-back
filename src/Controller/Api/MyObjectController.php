@@ -3,7 +3,6 @@
 namespace App\Controller\Api;
 
 use App\Entity\Category;
-use App\Entity\MyCollection;
 use App\Entity\MyObject;
 use App\Repository\CategoryRepository;
 use App\Repository\MyCollectionRepository;
@@ -81,17 +80,17 @@ class MyObjectController extends AbstractController
    {
 
     $jsonData = json_decode($request->getContent(), true);
-    
     $myObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
+   
 
-    $categoryId = $jsonData['releatedCategory'];
+    $categoryId = $jsonData['relatedCategory'];
     $category = $categoryRepository->find($categoryId);
 
     if (!$category) {
         return $this->json(['message' => 'Category not found'], 404);
     }
 
-    $myCollectionId = $jsonData['releatedMyCollections'];
+    $myCollectionId = $jsonData['relatedMyCollections'];
 
     $validator = Validation::createValidator();
     $violations = $validator->validate($myObject);
@@ -102,7 +101,6 @@ class MyObjectController extends AbstractController
         $myObject->setCategory($category);
         foreach ($myCollectionId as $collection) {
             $collectionId = $collection['id'];
-           
             $collectionToAdd = $myCollectionRepository->find($collectionId);
             if ($collectionToAdd) {
                 $myObject->addMyCollection($collectionToAdd);
@@ -135,8 +133,8 @@ class MyObjectController extends AbstractController
 
         $updateMyObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
 
-        $categoryId = $jsonData['releatedCategory'];
-        $myCollectionId = $jsonData['releatedMyCollections'];
+        $categoryId = $jsonData['relatedCategory'];
+        $myCollectionId = $jsonData['relatedMyCollections'];
         
         $updateCategory = $categoryRepository->find($categoryId);
 

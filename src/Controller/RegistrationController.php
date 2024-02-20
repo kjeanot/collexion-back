@@ -27,5 +27,5 @@ class RegistrationController extends AbstractController
         $entityManager->flush();
 
         return $this->json([$user,'message' => 'create successful'], 201);
-        }
+    }
 }
