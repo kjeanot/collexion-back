@@ -48,6 +48,14 @@ public function findRandomObjectSql()
  $resultSet = $conn->executeQuery($sql);
  return $resultSet->fetchAssociative();
 }
+public function findAllLimit5()
+{
+    return $this->createQueryBuilder('mo')
+        ->setMaxResults(5)
+        ->getQuery()
+        ->getResult()
+    ;
+}
 
 //    public function findOneBySomeField($value): ?MyObject
 //    {
