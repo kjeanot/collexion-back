@@ -3,7 +3,10 @@
 namespace App\Controller\Api;
 
 use App\Entity\MyCollection;
+use App\Entity\User;
 use App\Repository\MyCollectionRepository;
+use App\Repository\MyObjectRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -87,10 +90,15 @@ class MyCollectionController extends AbstractController
     * @return Response
     */
    #[Route('/collection', name: 'api_my_collection_create',methods: ['POST'])]
-   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer)
+   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, MyObjectRepository $myObjectRepository)
    {
 
+    // $jsonData = json_decode($request->getContent(), true);
+
     $myCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
+    // dd($myCollection);
+
+    // $myObjectId = $jsonData['myobjects'];
 
     $validator = Validation::createValidator();
     $violations = $validator->validate($myCollection);
@@ -100,6 +108,13 @@ class MyCollectionController extends AbstractController
     } else{
         // retrieve user
         $myCollection->setUser($this->getUser());
+        // foreach ($myObjectId as $object) {
+        //     $objectId = $object['id'];
+        //     $objectToAdd = $myObjectRepository->find($objectId);
+        //     if ($objectToAdd) {
+        //         $myCollection->addMyobject($objectToAdd);
+        //     }
+        // }
         
         $entityManager->persist($myCollection);
         $entityManager->flush();
@@ -115,7 +130,7 @@ class MyCollectionController extends AbstractController
     * @return Response
     */
     #[Route('/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
-    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer , Request $request): Response
+    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer , Request $request, MyObjectRepository $myObjectRepository): Response
     {
         // check if $myCollection doesn't exist
         if (!$myCollection) {
@@ -130,8 +145,8 @@ class MyCollectionController extends AbstractController
 
         $updateMyCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
 
-        $myObjectId = $jsonData['myobjects'];
-
+        $myObjectId = $jsonData['releatedObjects'];
+        
         $validator = Validation::createValidator();
         $violations = $validator->validate($updateMyCollection);
 
@@ -139,11 +154,14 @@ class MyCollectionController extends AbstractController
             return $this->json([$violations,500,['message' => 'error']]); ;
         } else{
             $myCollection->setUser($this->getUser());
-            $myCollection->setName($updateMyCollection->getName());
-            $myCollection->setDescription($updateMyCollection->getDescription());
-            $myCollection->setImage($updateMyCollection->getImage());
-            $myCollection->setIsActive($updateMyCollection->getIsActive());
-
+            foreach ($myObjectId as $object) {
+                $objectId = $object['id'];
+                $objectToRemove = $myObjectRepository->find($objectId);
+                if ($objectToRemove) {
+                    $myCollection->removeMyobject($objectToRemove);
+                }
+            }
+            
             $entityManager->flush();
 
             return $this->json($serializer->serialize($myCollection, 'json', ['groups' => 'collection']), 200, ['message' => 'update successful']);
@@ -201,29 +219,69 @@ class MyCollectionController extends AbstractController
             ['groups' => 'get_collections']
         );
     }
-    // #[Route('/collection_newfavori', name: 'api_my_collection_newfavori',methods: ['POST'])]
-    // public function favori(MyCollectionRepository $myCollectionRepository): Response
-    // {
-    //     // retrieve all collections
-    //     $collections = $myCollectionRepository->findRandomCollectionSql();
-    //     // check if $myCollection doesn't exist
-    //     if (!$collections) {
-    //         return $this->json(
-    //             "Error : Collection inexistante",
-    //             // status code
-    //             404
-    //         );
-    //     }
-    //     // return json
-    //     return $this->json(
-    //         // what I want to show
-    //         $collections,
-    //         // status code
-    //         200,
-    //         // header
-    //         ['Access-Control-Allow-Origin' => '*' ],
-    //         // groups authorized
-    //         ['groups' => 'get_collections']
-    //     );
-    // }
+    #[Route('/add/{id}/favorite', name: 'api_add_collection_favorite',methods: ['POST'])]
+    public function newFavorite(MyCollection $myCollection, EntityManagerInterface $entityManager,): Response
+    {
+        
+        if (!$myCollection) {
+            return $this->json(
+                "Error : Collection inexistante",
+                // status code
+                404
+            );
+        }
+
+        $myCollection->addUser($this->getUser());
+
+
+        $entityManager->persist($myCollection);
+        $entityManager->flush();
+
+        // return json
+        return $this->json(
+            // what I want to show
+            $myCollection,
+            // status code
+            200,
+            // header
+            ['Access-Control-Allow-Origin' => '*' ],
+            // groups authorized
+            ['groups' => 'get_favorite'],
+            ['message' => 'add successful']
+        );
+    }
+
+        #[Route('/delete/{id}/favorite', name: 'api_delete_collection_favorite',methods: ['POST'])]
+    public function deleteFavorite(MyCollection $myCollection, EntityManagerInterface $entityManager): Response
+    {
+
+
+        // check if $myCollection doesn't exist
+        if (!$myCollection) {
+            return $this->json(
+                "Error : Collection inexistante",
+                // status code
+                404
+            );
+        }
+
+        $myCollection->removeUser($this->getUser());
+
+
+        $entityManager->persist($myCollection);
+        $entityManager->flush();
+
+        // return json
+        return $this->json(
+            // what I want to show
+            $myCollection,
+            // status code
+            200,
+            // header
+            [],
+            // groups authorized
+            ['groups' => 'get_favorite'],
+            ['message' => 'delete successful']
+        );
+    }
 }

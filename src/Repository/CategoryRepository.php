@@ -38,6 +38,21 @@ public function  findAllCategoriesChild()
     return $resultSet->fetchAllAssociative();
    }
 
+   public function  findAllCategoriesChildById($categoryId)
+   {
+    $conn = $this->getEntityManager()->getConnection();
+
+    $sql = '
+    SELECT c.id, c.name , c.image
+    FROM category_category As cc
+    INNER JOIN category AS c ON cc.category_target = c.id
+    WHERE cc.category_source = :categoryId
+    ';
+
+    $resultSet = $conn->executeQuery($sql, ['categoryId' => $categoryId]);
+    return $resultSet->fetchAllAssociative();
+   }
+
    public function  findAllCategoriesParent()
    {
     $conn = $this->getEntityManager()->getConnection();
