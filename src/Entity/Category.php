@@ -6,6 +6,7 @@ use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
@@ -13,19 +14,27 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get_categories','get_object', 'get_categorie_childs'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['get_categories','get_object', 'get_categorie_childs'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: MyObject::class, orphanRemoval: true)]
+    #[Groups(['get_categorie_childs'])]
     private Collection $objects;
 
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'categories')]
+    #[Groups(['get_categorie_childs'])]
     private Collection $category;
 
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'category')]
     private Collection $categories;
+
+    #[ORM\Column(length: 2083)]
+    #[Groups(['get_categories', 'get_categorie_childs'])]
+    private ?string $image = null;
 
     public function __construct()
     {
@@ -111,5 +120,17 @@ class Category
     public function getCategories(): Collection
     {
         return $this->categories;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): static
+    {
+        $this->image = $image;
+
+        return $this;
     }
 }

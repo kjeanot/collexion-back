@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\MyCollectionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\MyCollectionRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MyCollectionRepository::class)]
 class MyCollection
@@ -14,34 +15,55 @@ class MyCollection
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get_collections', 'collection','get_object','get_user','get_collection','get_favorite'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['get_collections','collection','get_object','get_user','get_collection','get_favorite'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 2083)]
+    #[Groups(['get_collections','collection','get_object','get_user','get_collection','get_favorite'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['get_collections','collection','get_object','get_collection','get_favorite'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['get_collections','collection','get_object','get_collection','get_favorite'])]
     private ?float $rating = null;
 
     #[ORM\ManyToOne(inversedBy: 'mycollections')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get_collections','get_collection'])]
     private ?User $user = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'myfavoritescollections')]
+    #[Groups(['get_object'])]
     private Collection $users;
 
     #[ORM\ManyToMany(targetEntity: MyObject::class, inversedBy: 'myCollections')]
+    #[Groups(['get_collections','get_collection',])]
     private Collection $myobjects;
+
+    #[ORM\Column]
+    #[Groups(['get_collections','get_favorite',])]
+    private ?\DateTimeImmutable $created_at = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updated_at = null;
+
+    #[ORM\Column]
+    private ?bool $is_active = null;
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->myobjects = new ArrayCollection();
+        $this->created_at = new \DateTimeImmutable();
+        $this->updated_at = new \DateTimeImmutable();
+        $this->is_active = false;
     }
 
     public function getId(): ?int
@@ -121,7 +143,7 @@ class MyCollection
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
-            $user->addMyfavoritescollection($this);
+            $user->addMyFavoriteCollection($this);
         }
 
         return $this;
@@ -130,7 +152,7 @@ class MyCollection
     public function removeUser(User $user): static
     {
         if ($this->users->removeElement($user)) {
-            $user->removeMyfavoritescollection($this);
+            $user->removeMyFavoriteCollection($this);
         }
 
         return $this;
@@ -156,6 +178,42 @@ class MyCollection
     public function removeMyobject(MyObject $myobject): static
     {
         $this->myobjects->removeElement($myobject);
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updated_at): static
+    {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function isIsActive(): ?bool
+    {
+        return $this->is_active;
+    }
+
+    public function setIsActive(bool $is_active): static
+    {
+        $this->is_active = $is_active;
 
         return $this;
     }

@@ -24,6 +24,73 @@ class CategoryRepository extends ServiceEntityRepository
 //    /**
 //     * @return Category[] Returns an array of Category objects
 //     */
+public function  findAllCategoriesChild()
+   {
+    $conn = $this->getEntityManager()->getConnection();
+
+    $sql = '
+    SELECT c.id, c.name , c.image
+    FROM category_category As cc
+    INNER JOIN category AS c ON cc.category_target = c.id
+    ';
+
+    $resultSet = $conn->executeQuery($sql);
+    return $resultSet->fetchAllAssociative();
+   }
+
+   public function  findAllCategoriesChildById($categoryId)
+   {
+    $conn = $this->getEntityManager()->getConnection();
+
+    $sql = '
+    SELECT c.id, c.name , c.image
+    FROM category_category As cc
+    INNER JOIN category AS c ON cc.category_target = c.id
+    WHERE cc.category_source = :categoryId
+    ';
+
+    $resultSet = $conn->executeQuery($sql, ['categoryId' => $categoryId]);
+    return $resultSet->fetchAllAssociative();
+   }
+
+   public function  findAllCategoriesParent()
+   {
+    $conn = $this->getEntityManager()->getConnection();
+
+    $sql = '
+    SELECT DISTINCT c.id, c.name, c.image
+    FROM category_category As cc
+    INNER JOIN category AS c ON cc.category_source = c.id
+    ';
+
+    $resultSet = $conn->executeQuery($sql);
+    return $resultSet->fetchAllAssociative();
+   }
+
+   public function  findAllCategoriesRelation()
+   {
+    $conn = $this->getEntityManager()->getConnection();
+
+    $sql = '
+    SELECT c1.id, c1.name AS category_source, c2.name AS category_target 
+    FROM category_category AS cc 
+    INNER JOIN category AS c1 ON cc.category_source = c1.id 
+    INNER JOIN category AS c2 ON cc.category_target = c2.id;
+    ';
+
+    $resultSet = $conn->executeQuery($sql);
+    return $resultSet->fetchAllAssociative();
+   }
+
+   public function findAllLimit5()
+   {
+       return $this->createQueryBuilder('c')
+           ->setMaxResults(5)
+           ->getQuery()
+           ->getResult()
+       ;
+   }
+
 //    public function findByExampleField($value): array
 //    {
 //        return $this->createQueryBuilder('c')

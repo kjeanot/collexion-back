@@ -20,6 +20,14 @@ class MyCollectionRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, MyCollection::class);
     }
+    public function findAllLimit5()
+    {
+        return $this->createQueryBuilder('mc')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
 //    /**
 //     * @return MyCollection[] Returns an array of MyCollection objects
@@ -45,4 +53,38 @@ class MyCollectionRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+public function findRandomCollectionSql()
+{
+ $conn = $this->getEntityManager()->getConnection();
+
+ $sql = '
+ SELECT *
+ FROM my_collection
+ ORDER BY RAND()
+ LIMIT 1
+     ';
+ $resultSet = $conn->executeQuery($sql);
+ return $resultSet->fetchAssociative();
 }
+
+    /*
+    public function getRandomMovieDql()
+    {
+        // step 1 : call EntityMAnager
+        $manager = $this->getEntityManager();
+        // step 2 : on build SQL query
+        $query = $manager->createQuery(
+            'SELECT m
+            FROM App\Entity\MyCollection AS m
+            ORDER BY RAND()'
+        )->setMaxResults(1);
+
+        // step 3 : execute the sql query and return the result
+        return $query->getResult();
+    
+    }
+    */
+
+}
+
+

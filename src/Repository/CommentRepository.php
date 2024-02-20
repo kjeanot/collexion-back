@@ -20,6 +20,14 @@ class CommentRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Comment::class);
     }
+    public function findAllLimit5()
+    {
+        return $this->createQueryBuilder('c')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
 //    /**
 //     * @return Comment[] Returns an array of Comment objects

@@ -7,42 +7,54 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get_collections', 'get_users','get_object','get_user','get_collection'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['get_users','get_object','get_user'])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['get_users','get_user'])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(['get_user'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['get_collections', 'get_users','get_object','get_user','get_collection'])]
     private ?string $nickname = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['get_users','get_object','get_user'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 2083, nullable: true)]
+    #[Groups(['get_collections', 'get_users','get_object','get_user','get_collection'])]
     private ?string $picture = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: MyCollection::class, orphanRemoval: true)]
+    #[Groups(['get_user'])]
     private Collection $mycollections;
 
     #[ORM\ManyToMany(targetEntity: MyCollection::class, inversedBy: 'users')]
+    #[Groups(['get_user'])]
     private Collection $myfavoritescollections;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Comment::class, orphanRemoval: true)]
@@ -199,7 +211,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->myfavoritescollections;
     }
 
-    public function addMyfavoritescollection(MyCollection $myfavoritescollection): static
+    public function addMyFavoriteCollection(MyCollection $myfavoritescollection): static
     {
         if (!$this->myfavoritescollections->contains($myfavoritescollection)) {
             $this->myfavoritescollections->add($myfavoritescollection);
@@ -208,7 +220,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeMyfavoritescollection(MyCollection $myfavoritescollection): static
+    public function removeMyFavoriteCollection(MyCollection $myfavoritescollection): static
     {
         $this->myfavoritescollections->removeElement($myfavoritescollection);
 
