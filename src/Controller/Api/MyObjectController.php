@@ -3,7 +3,6 @@
 namespace App\Controller\Api;
 
 use App\Entity\Category;
-use App\Entity\MyCollection;
 use App\Entity\MyObject;
 use App\Repository\CategoryRepository;
 use App\Repository\MyCollectionRepository;
@@ -67,7 +66,7 @@ class MyObjectController extends AbstractController
             $myObject,
             200,
             ['Access-Control-Allow-Origin' => '*'],
-            ['groups' => 'get_objects']
+            ['groups' => 'get_object']
             );
     } 
 
@@ -78,19 +77,21 @@ class MyObjectController extends AbstractController
     * @return Response
     */
    #[Route('/object', name: 'api_my_object_create',methods: ['POST'])]
-   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, Category $category = null, CategoryRepository $categoryRepository)
+   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, Category $category = null, CategoryRepository $categoryRepository, MyCollectionRepository $myCollectionRepository)
    {
 
     $jsonData = json_decode($request->getContent(), true);
-    
     $myObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
+   
 
-    $categoryId = $jsonData['category'];
+    $categoryId = $jsonData['relatedCategory'];
     $category = $categoryRepository->find($categoryId);
 
     if (!$category) {
         return $this->json(['message' => 'Category not found'], 404);
     }
+
+    $myCollectionId = $jsonData['relatedMyCollections'];
 
     $validator = Validation::createValidator();
     $violations = $validator->validate($myObject);
@@ -99,6 +100,13 @@ class MyObjectController extends AbstractController
         return $this->json([$violations, 500, ['message' => 'error']]);
     } else {
         $myObject->setCategory($category);
+        foreach ($myCollectionId as $collection) {
+            $collectionId = $collection['id'];
+            $collectionToAdd = $myCollectionRepository->find($collectionId);
+            if ($collectionToAdd) {
+                $myObject->addMyCollection($collectionToAdd);
+            }
+        }
         $entityManager->persist($myObject);
         $entityManager->flush();
 
@@ -113,7 +121,7 @@ class MyObjectController extends AbstractController
     * @return Response
     */
     #[Route('/object/{id}', name: 'api_my_object_update',methods: ['PUT'])]
-    public function update(MyObject $myObject = null, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, SerializerInterface $serializer , Request $request): Response
+    public function update(MyObject $myObject = null, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, SerializerInterface $serializer , Request $request, MyCollectionRepository $myCollectionRepository): Response
     {
         if (!$myObject) {
             return $this->json(
@@ -126,7 +134,9 @@ class MyObjectController extends AbstractController
 
         $updateMyObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
 
-        $categoryId = $jsonData['category'];
+        $categoryId = $jsonData['relatedCategory'];
+        $myCollectionId = $jsonData['relatedMyCollections'];
+        
         $updateCategory = $categoryRepository->find($categoryId);
 
         if (!$updateCategory) {
@@ -145,6 +155,14 @@ class MyObjectController extends AbstractController
             $myObject->setDescription($updateMyObject->getDescription());
             $myObject->setImage($updateMyObject->getImage());
             $myObject->setState($updateMyObject->getState());
+            foreach ($myCollectionId as $collection) {
+                $collectionId = $collection['id'];
+               
+                $collectionToAdd = $myCollectionRepository->find($collectionId);
+                if ($collectionToAdd) {
+                    $myObject->addMyCollection($collectionToAdd);
+                }
+            }
 
             $entityManager->flush();
 
@@ -200,4 +218,31 @@ class MyObjectController extends AbstractController
             'message' => 'Image uploaded successfully.'
         ]);
     }
-}
+  
+    #[Route('/object_random', name: 'api_my_object_random',methods: ['GET'])]
+    public function random(MyObjectRepository $myObjectRepository): Response
+    {
+        // retrieve all collections
+        $objectRandom = $myObjectRepository->findRandomObjectSql();
+        
+        // check if $myCollection doesn't exist
+        if (!$objectRandom) {
+            return $this->json(
+                "Error : Objet inexistant",
+                // status code
+                404
+            );
+        }
+
+        // return json
+        return $this->json(
+            // what I want to show
+            $objectRandom,
+            // status code
+            200,
+            // header
+            ['Access-Control-Allow-Origin' => '*' ],
+            // groups authorized
+            ['groups' => 'get_objects']
+        );
+    }

@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+
 
 // root URL for all routes from MyCollectionController
 #[Route('/api')]
@@ -21,7 +24,7 @@ class UserController extends AbstractController
      *
      * @return Response
      */
-    #[Route('/users', name: 'app_user_list',methods: ['GET'])]
+    #[Route('/users', name: 'api_user_list',methods: ['GET'])]
     public function list(UserRepository $userRepository): Response
     {
         // retrieve all users
@@ -54,7 +57,7 @@ class UserController extends AbstractController
      *
      * @return Response
      */
-    #[Route('/user/{id}', name: 'app_user_show',methods: ['GET'])]
+    #[Route('/user/{id}', name: 'api_user_show',methods: ['GET'])]
     public function show(User $user): Response
     {
         // check if $user doesn't exist
@@ -75,42 +78,18 @@ class UserController extends AbstractController
             // header
             ['Access-Control-Allow-Origin' => '*' ],
             // groups authorized
-            ['groups' => 'get_users']
+            ['groups' => 'get_user']
         );
     }
-
+  
     /**
-     * show one user by its id
-     *
-     * @return Response
-     */
-    #[Route('/user', name: 'app_user_create',methods: ['POST'])]
-    public function create(EntityManagerInterface $manager): Response
-    {
-        $user = new User();
-        // set
-        $user->setEmail('testApidohijsdfùgh@test.com');
-        $user->setNickname('test');
-        $user->setDescription('Cheesecake macaroni cheese melted cheese. Cheese strings macaroni cheese cheesecake say cheese manchego airedale squirty cheese parmesan. Cheese and wine goat roquefort squirty cheese melted cheese who moved my cheese emmental mascarpone. Feta cheese strings danish fontina.
-        Cheese and biscuits edam cauliflower cheese. Chalk and cheese the big cheese airedale monterey jack cottage cheese fromage frais cow say cheese. Halloumi manchego boursin red leicester say cheese roquefort dolcelatte parmesan. Paneer cheese triangles fondue edam lancashire.');
-        $user->setImage('https://img.colleconline.com/imgdescription/06af8fba638441b0921770665abc0915/ae0fa799-3150-45ed-9f57-f3831d30e6ee.jpg');
-        $user->setPassword(password_hash('user', PASSWORD_BCRYPT));
-        $user->setRoles(['ROLE_USER']);
-        // record in database
-        $manager->persist($user);
-        $manager->flush();
-
-        return $this->json([201, ['message' => 'create successful']]);
-    }
-
-        /**
     * update one user
     *
     * @param UserRepository $userRepository
     * @return Response
     */
     #[Route('/user/{id}', name: 'api_user_update',methods: ['PUT'])]
-    public function update(User $user = null, EntityManagerInterface $entityManager): Response
+    public function update(User $user = null,Request $request, EntityManagerInterface $entityManager,SerializerInterface $serializer,  UserPasswordHasherInterface $passwordHasher): Response
     {
         // check if $user doesn't exist
         if (!$user) {
@@ -120,14 +99,20 @@ class UserController extends AbstractController
                 404
             );
         }
+    // Désérialiser les données de la requête PUT dans un objet User
+    $userUpdateRequest = $serializer->deserialize($request->getContent(), User::class, 'json');
 
-        $user->setEmail('testzrtyhzrthszrthsrgfhdfg@test.com');
-        $user->setNickname('test');
-        $user->setDescription('Cheesecake macaroni cheese melted cheese. Cheese strings macaroni cheese cheesecake say cheese manchego airedale squirty cheese parmesan. Cheese and wine goat roquefort squirty cheese melted cheese who moved my cheese emmental mascarpone. Feta cheese strings danish fontina.
-        Cheese and biscuits edam cauliflower cheese. Chalk and cheese the big cheese airedale monterey jack cottage cheese fromage frais cow say cheese. Halloumi manchego boursin red leicester say cheese roquefort dolcelatte parmesan. Paneer cheese triangles fondue edam lancashire.');
-        $user->setImage('https://img.colleconline.com/imgdescription/06af8fba638441b0921770665abc0915/ae0fa799-3150-45ed-9f57-f3831d30e6ee.jpg');
-        $user->setPassword(password_hash('user', PASSWORD_BCRYPT));
-        $user->setRoles(['ROLE_USER']);
+    // Mettre à jour les propriétés de l'utilisateur existant avec les données de l'objet User
+    $user->setEmail($userUpdateRequest->getEmail());
+    $user->setNickname($userUpdateRequest->getNickname());
+    $user->setDescription($userUpdateRequest->getDescription());
+    $user->setPicture($userUpdateRequest->getPicture());
+    
+    // Vérifier et mettre à jour le mot de passe si nécessaire
+    if ($userUpdateRequest->getPassword()) {
+        $hashedPassword = $passwordHasher->hashPassword($user, $userUpdateRequest->getPassword());
+        $user->setPassword($hashedPassword);
+    }
 
         $entityManager->flush();
  
@@ -160,6 +145,7 @@ class UserController extends AbstractController
        
     }
 
+
     #[Route('/user/upload_file', name: 'api_user_upload_file', methods: ['POST'])]
     public function upload(Request $request, UserRepository $userRepository, ParameterBagInterface $params,User $user, EntityManagerInterface $manager)
     {
@@ -176,8 +162,8 @@ class UserController extends AbstractController
         $newFilename = uniqid().'.'. $image->getClientOriginalName();
 
         // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
-		// $entity est l'entity qui doit recevoir votre image
-		$user->setImage($newFilename);
+		    // $entity est l'entity qui doit recevoir votre image
+		    $user->setImage($newFilename);
 
         $manager->flush();
 
@@ -185,4 +171,5 @@ class UserController extends AbstractController
             'message' => 'Image uploaded successfully.'
         ]);
     }
-}
+
+}   

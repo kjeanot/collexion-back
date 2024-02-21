@@ -15,39 +15,40 @@ class MyCollection
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['get_collections', 'collection'])]
+    #[Groups(['get_collections', 'collection','get_object','get_user','get_collection','get_favorite'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_collections','collection'])]
+    #[Groups(['get_collections','collection','get_object','get_user','get_collection','get_favorite'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 2083)]
-    #[Groups(['get_collections','collection'])]
+    #[Groups(['get_collections','collection','get_object','get_user','get_collection','get_favorite'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['get_collections','collection'])]
+    #[Groups(['get_collections','collection','get_object','get_collection','get_favorite'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['get_collections','collection'])]
+    #[Groups(['get_collections','collection','get_object','get_collection','get_favorite'])]
     private ?float $rating = null;
 
     #[ORM\ManyToOne(inversedBy: 'mycollections')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get_collections'])]
+    #[Groups(['get_collections','get_collection'])]
     private ?User $user = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'myfavoritescollections')]
+    #[Groups(['get_object'])]
     private Collection $users;
 
     #[ORM\ManyToMany(targetEntity: MyObject::class, inversedBy: 'myCollections')]
-    #[Groups(['get_collections'])]
+    #[Groups(['get_collections','get_collection',])]
     private Collection $myobjects;
 
     #[ORM\Column]
-    #[Groups(['get_collections'])]
+    #[Groups(['get_collections','get_favorite',])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]

@@ -19,39 +19,43 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['get_collections', 'get_users'])]
+    #[Groups(['get_collections', 'get_users','get_object','get_user','get_collection'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['get_users'])]
+    #[Groups(['get_users','get_object','get_user'])]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(['get_users'])]
+    #[Groups(['get_users','get_user'])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(['get_user'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_collections', 'get_users'])]
+    #[Groups(['get_collections', 'get_users','get_object','get_user','get_collection'])]
     private ?string $nickname = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['get_users'])]
+    #[Groups(['get_users','get_object','get_user'])]
     private ?string $description = null;
+
 
     #[ORM\Column(length: 2083)]
     #[Groups(['get_objects','get_collections','object'])]
     private ?string $image = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: MyCollection::class, orphanRemoval: true)]
+    #[Groups(['get_user'])]
     private Collection $mycollections;
 
     #[ORM\ManyToMany(targetEntity: MyCollection::class, inversedBy: 'users')]
+    #[Groups(['get_user'])]
     private Collection $myfavoritescollections;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Comment::class, orphanRemoval: true)]
