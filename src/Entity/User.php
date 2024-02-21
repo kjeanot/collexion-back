@@ -46,7 +46,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $description = null;
 
 
-    #[ORM\Column(length: 2083)]
+    #[ORM\Column(length: 2083,nullable: true)]
     #[Groups(['get_objects','get_collections','object'])]
     private ?string $image = null;
 

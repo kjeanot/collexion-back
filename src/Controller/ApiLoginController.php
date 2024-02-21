@@ -39,7 +39,7 @@ class ApiLoginController extends AbstractController
             'roles'  => $user->getRoles(),
             'password'  => $user->getPassword(),
             'description'  => $user->getDescription(),
-            'picture'  => $user->getPicture()
+            'image'  => $user->getImage()
         ]);
     }
 }

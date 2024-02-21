@@ -106,7 +106,7 @@ class UserController extends AbstractController
     $user->setEmail($userUpdateRequest->getEmail());
     $user->setNickname($userUpdateRequest->getNickname());
     $user->setDescription($userUpdateRequest->getDescription());
-    $user->setPicture($userUpdateRequest->getPicture());
+    $user->setImage($userUpdateRequest->getImage());
     
     // Vérifier et mettre à jour le mot de passe si nécessaire
     if ($userUpdateRequest->getPassword()) {
