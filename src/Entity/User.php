@@ -44,9 +44,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['get_users'])]
     private ?string $description = null;
 
-    #[ORM\Column(length: 2083, nullable: true)]
-    #[Groups(['get_collections', 'get_users'])]
-    private ?string $picture = null;
+    #[ORM\Column(length: 2083)]
+    #[Groups(['get_objects','get_collections','object'])]
+    private ?string $image = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: MyCollection::class, orphanRemoval: true)]
     private Collection $mycollections;
@@ -158,14 +158,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPicture(): ?string
+    public function getImage(): ?string
     {
-        return $this->picture;
+        return $this->image;
     }
 
-    public function setPicture(?string $picture): static
+    public function setImage(string $image): static
     {
-        $this->picture = $picture;
+        $this->image = $image;
 
         return $this;
     }

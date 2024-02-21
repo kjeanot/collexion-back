@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 // root URL for all routes from MyCollectionController
 #[Route('/api')]
@@ -92,7 +93,7 @@ class UserController extends AbstractController
         $user->setNickname('test');
         $user->setDescription('Cheesecake macaroni cheese melted cheese. Cheese strings macaroni cheese cheesecake say cheese manchego airedale squirty cheese parmesan. Cheese and wine goat roquefort squirty cheese melted cheese who moved my cheese emmental mascarpone. Feta cheese strings danish fontina.
         Cheese and biscuits edam cauliflower cheese. Chalk and cheese the big cheese airedale monterey jack cottage cheese fromage frais cow say cheese. Halloumi manchego boursin red leicester say cheese roquefort dolcelatte parmesan. Paneer cheese triangles fondue edam lancashire.');
-        $user->setPicture('https://img.colleconline.com/imgdescription/06af8fba638441b0921770665abc0915/ae0fa799-3150-45ed-9f57-f3831d30e6ee.jpg');
+        $user->setImage('https://img.colleconline.com/imgdescription/06af8fba638441b0921770665abc0915/ae0fa799-3150-45ed-9f57-f3831d30e6ee.jpg');
         $user->setPassword(password_hash('user', PASSWORD_BCRYPT));
         $user->setRoles(['ROLE_USER']);
         // record in database
@@ -124,7 +125,7 @@ class UserController extends AbstractController
         $user->setNickname('test');
         $user->setDescription('Cheesecake macaroni cheese melted cheese. Cheese strings macaroni cheese cheesecake say cheese manchego airedale squirty cheese parmesan. Cheese and wine goat roquefort squirty cheese melted cheese who moved my cheese emmental mascarpone. Feta cheese strings danish fontina.
         Cheese and biscuits edam cauliflower cheese. Chalk and cheese the big cheese airedale monterey jack cottage cheese fromage frais cow say cheese. Halloumi manchego boursin red leicester say cheese roquefort dolcelatte parmesan. Paneer cheese triangles fondue edam lancashire.');
-        $user->setPicture('https://img.colleconline.com/imgdescription/06af8fba638441b0921770665abc0915/ae0fa799-3150-45ed-9f57-f3831d30e6ee.jpg');
+        $user->setImage('https://img.colleconline.com/imgdescription/06af8fba638441b0921770665abc0915/ae0fa799-3150-45ed-9f57-f3831d30e6ee.jpg');
         $user->setPassword(password_hash('user', PASSWORD_BCRYPT));
         $user->setRoles(['ROLE_USER']);
 
@@ -157,5 +158,31 @@ class UserController extends AbstractController
 
         return $this->json(['message' => 'delete successful', 200]);
        
+    }
+
+    #[Route('/user/upload_file', name: 'api_user_upload_file', methods: ['POST'])]
+    public function upload(Request $request, UserRepository $userRepository, ParameterBagInterface $params,User $user, EntityManagerInterface $manager)
+    {
+        // for test only in the back side
+        $user = $userRepository->find(15);
+
+        $image = $request->files->get('file');
+        
+        // enregistrement de l'image dans le dossier public du serveur
+        // paramas->get('public') =>  va chercher dans services.yaml la variable public
+        $image->move($params->get('images_users'), $image->getClientOriginalName());
+				
+        // on ajoute uniqid() afin de ne pas avoir 2 fichiers avec le même nom
+        $newFilename = uniqid().'.'. $image->getClientOriginalName();
+
+        // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
+		// $entity est l'entity qui doit recevoir votre image
+		$user->setImage($newFilename);
+
+        $manager->flush();
+
+        return $this->json([
+            'message' => 'Image uploaded successfully.'
+        ]);
     }
 }

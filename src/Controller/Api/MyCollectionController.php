@@ -2,20 +2,14 @@
 
 namespace App\Controller\Api;
 
-use Exception;
-use App\Entity\User;
 use App\Entity\MyCollection;
-use App\Form\MyCollectionType;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\MyCollectionRepository;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -121,8 +115,9 @@ class MyCollectionController extends AbstractController
     * @return Response
     */
     #[Route('/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
-    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer , Request $request): Response
+    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer, Request $request,ParameterBagInterface $params): Response
     {
+        
         // check if $myCollection doesn't exist
         if (!$myCollection) {
             return $this->json(
@@ -180,28 +175,26 @@ class MyCollectionController extends AbstractController
     /**
      * @Route("/uploadFile", name="upload", methods={"POST"})
      */
-    #[Route('/upload_file', name: 'api_upload_file', methods: ['POST'])]
-    public function upload(Request $request, ParameterBagInterface $params, MyCollection $myCollection)
+    #[Route('/collection/upload_file', name: 'api_collection_upload_file', methods: ['POST'])]
+    public function upload(Request $request, MyCollectionRepository $myCollectionRepository, ParameterBagInterface $params, MyCollection $myCollection,EntityManagerInterface $manager)
     {
-        dd($request);
+        // for test only in the back side
+         $myCollection = $myCollectionRepository->find(19);
 
         $image = $request->files->get('file');
-
-        // check if $image exist
-        /* if ($image === null) {
-            throw new Exception("L'objet image est null");
-        } */
         
         // enregistrement de l'image dans le dossier public du serveur
         // paramas->get('public') =>  va chercher dans services.yaml la variable public
-        $image->move($params->get('public'), $image->getClientOriginalName());
-
+        $image->move($params->get('images_collections'), $image->getClientOriginalName());
 				
         // on ajoute uniqid() afin de ne pas avoir 2 fichiers avec le même nom
         $newFilename = uniqid().'.'. $image->getClientOriginalName();
+
         // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
-				// $entity est l'entity qui doit recevoir votre image
-				$myCollection->setImage($newFilename);
+		// $entity est l'entity qui doit recevoir votre image
+		$myCollection->setImage($newFilename);
+
+        $manager->flush();
 
         return $this->json([
             'message' => 'Image uploaded successfully.'

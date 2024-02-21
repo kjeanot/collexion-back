@@ -27,7 +27,7 @@
                 <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
                 <td>{{ user.nickname }}</td>
                 <td>{{ user.description|slice(0, 30) }}...</td>
-                <td>{{ user.picture|slice(0, 30) }}...</td>
+                <td>{{ user.image|slice(0, 30) }}...</td>
                 <td>
                     <a href="{{ path('app_back_user_show', {'id': user.id}) }}"class="btn btn-sm btn-info">show</a>
                     <a href="{{ path('app_back_user_edit', {'id': user.id}) }}"class="btn btn-sm btn-warning">edit</a>
