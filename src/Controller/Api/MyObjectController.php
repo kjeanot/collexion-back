@@ -246,3 +246,4 @@ class MyObjectController extends AbstractController
             ['groups' => 'get_objects']
         );
     }
+}

@@ -3,7 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\MyCollection;
-
+use App\Entity\MyObject;
 use App\Entity\User;
 use App\Repository\MyObjectRepository;
 use Doctrine\ORM\EntityManager;
@@ -133,7 +133,7 @@ class MyCollectionController extends AbstractController
     */
     #[Route('/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
 
-    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer, Request $request,ParameterBagInterface $params): Response
+    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer, Request $request,MyObjectRepository $myObjectRepository): Response
 
     {
         
@@ -318,3 +318,4 @@ class MyCollectionController extends AbstractController
             ['message' => 'delete successful']
         );
     }
+}
