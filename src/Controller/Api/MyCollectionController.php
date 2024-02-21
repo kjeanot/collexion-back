@@ -140,20 +140,24 @@ class MyCollectionController extends AbstractController
                 404
             );
         }
-
+        // retrieve data from request
         $jsonData = json_decode($request->getContent(), true);
-
+        // deserialize data
         $updateMyCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
-
-        $myObjectId = $jsonData['releatedObjects'];
-        
+        // retrieve related objects
+        $myObjectId = $jsonData['relatedObjects'];
+        // validate data
         $validator = Validation::createValidator();
         $violations = $validator->validate($updateMyCollection);
-
+        // if there is an error
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
         } else{
             $myCollection->setUser($this->getUser());
+            $myCollection->setName($updateMyCollection->getName());
+            $myCollection->setDescription($updateMyCollection->getDescription());
+            $myCollection->setImage($updateMyCollection->getImage());
+            $myCollection->setIsActive($updateMyCollection->isIsActive());
             foreach ($myObjectId as $object) {
                 $objectId = $object['id'];
                 $objectToRemove = $myObjectRepository->find($objectId);
@@ -214,15 +218,15 @@ class MyCollectionController extends AbstractController
             // status code
             200,
             // header
-            ['Access-Control-Allow-Origin' => '*' ],
+            [],
             // groups authorized
             ['groups' => 'get_collections']
         );
     }
     #[Route('/add/{id}/favorite', name: 'api_add_collection_favorite',methods: ['POST'])]
-    public function newFavorite(MyCollection $myCollection, EntityManagerInterface $entityManager,): Response
+    public function newFavorite(MyCollection $myCollection = null, EntityManagerInterface $entityManager,): Response
     {
-        
+        // check if $myCollection doesn't exist
         if (!$myCollection) {
             return $this->json(
                 "Error : Collection inexistante",
@@ -230,9 +234,8 @@ class MyCollectionController extends AbstractController
                 404
             );
         }
-
+        // add user to collection favorite
         $myCollection->addUser($this->getUser());
-
 
         $entityManager->persist($myCollection);
         $entityManager->flush();
@@ -244,7 +247,7 @@ class MyCollectionController extends AbstractController
             // status code
             200,
             // header
-            ['Access-Control-Allow-Origin' => '*' ],
+            [],
             // groups authorized
             ['groups' => 'get_favorite'],
             ['message' => 'add successful']
@@ -252,10 +255,8 @@ class MyCollectionController extends AbstractController
     }
 
         #[Route('/delete/{id}/favorite', name: 'api_delete_collection_favorite',methods: ['POST'])]
-    public function deleteFavorite(MyCollection $myCollection, EntityManagerInterface $entityManager): Response
+    public function deleteFavorite(MyCollection $myCollection = null, EntityManagerInterface $entityManager): Response
     {
-
-
         // check if $myCollection doesn't exist
         if (!$myCollection) {
             return $this->json(
@@ -264,9 +265,8 @@ class MyCollectionController extends AbstractController
                 404
             );
         }
-
+        // remove user from collection favorite
         $myCollection->removeUser($this->getUser());
-
 
         $entityManager->persist($myCollection);
         $entityManager->flush();
