@@ -10,8 +10,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+
 
 // root URL for all routes from MyCollectionController
 #[Route('/api')]
@@ -79,8 +81,8 @@ class UserController extends AbstractController
             ['groups' => 'get_user']
         );
     }
-
-        /**
+  
+    /**
     * update one user
     *
     * @param UserRepository $userRepository
@@ -97,7 +99,6 @@ class UserController extends AbstractController
                 404
             );
         }
-
     // Désérialiser les données de la requête PUT dans un objet User
     $userUpdateRequest = $serializer->deserialize($request->getContent(), User::class, 'json');
 
@@ -143,5 +144,32 @@ class UserController extends AbstractController
         return $this->json(['message' => 'delete successful', 200]);
        
     }
-    
-}
+
+
+    #[Route('/user/upload_file', name: 'api_user_upload_file', methods: ['POST'])]
+    public function upload(Request $request, UserRepository $userRepository, ParameterBagInterface $params,User $user, EntityManagerInterface $manager)
+    {
+        // for test only in the back side
+        $user = $userRepository->find(15);
+
+        $image = $request->files->get('file');
+        
+        // enregistrement de l'image dans le dossier public du serveur
+        // paramas->get('public') =>  va chercher dans services.yaml la variable public
+        $image->move($params->get('images_users'), $image->getClientOriginalName());
+				
+        // on ajoute uniqid() afin de ne pas avoir 2 fichiers avec le même nom
+        $newFilename = uniqid().'.'. $image->getClientOriginalName();
+
+        // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
+		    // $entity est l'entity qui doit recevoir votre image
+		    $user->setImage($newFilename);
+
+        $manager->flush();
+
+        return $this->json([
+            'message' => 'Image uploaded successfully.'
+        ]);
+    }
+
+}   

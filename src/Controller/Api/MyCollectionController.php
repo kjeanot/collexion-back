@@ -3,17 +3,19 @@
 namespace App\Controller\Api;
 
 use App\Entity\MyCollection;
+
 use App\Entity\User;
-use App\Repository\MyCollectionRepository;
 use App\Repository\MyObjectRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\MyCollectionRepository;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validation;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 // root URL for all routes from MyCollectionController
 #[Route('/api')]
@@ -130,8 +132,11 @@ class MyCollectionController extends AbstractController
     * @return Response
     */
     #[Route('/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
-    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer , Request $request, MyObjectRepository $myObjectRepository): Response
+
+    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer, Request $request,ParameterBagInterface $params): Response
+
     {
+        
         // check if $myCollection doesn't exist
         if (!$myCollection) {
             return $this->json(
@@ -196,6 +201,35 @@ class MyCollectionController extends AbstractController
         return $this->json(['message' => 'delete successful', 200]);
        
     }
+
+    /**
+     * @Route("/uploadFile", name="upload", methods={"POST"})
+     */
+    #[Route('/collection/upload_file', name: 'api_collection_upload_file', methods: ['POST'])]
+    public function upload(Request $request, MyCollectionRepository $myCollectionRepository, ParameterBagInterface $params, MyCollection $myCollection,EntityManagerInterface $manager)
+    {
+        // for test only in the back side
+         $myCollection = $myCollectionRepository->find(19);
+
+        $image = $request->files->get('file');
+        
+        // enregistrement de l'image dans le dossier public du serveur
+        // paramas->get('public') =>  va chercher dans services.yaml la variable public
+        $image->move($params->get('images_collections'), $image->getClientOriginalName());
+				
+        // on ajoute uniqid() afin de ne pas avoir 2 fichiers avec le même nom
+        $newFilename = uniqid().'.'. $image->getClientOriginalName();
+
+        // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
+		// $entity est l'entity qui doit recevoir votre image
+		$myCollection->setImage($newFilename);
+
+        $manager->flush();
+
+        return $this->json([
+            'message' => 'Image uploaded successfully.'
+        ]);
+    } 
     #[Route('/collection_random', name: 'api_my_collection_random',methods: ['GET'])]
     public function random(MyCollectionRepository $myCollectionRepository): Response
     {
@@ -284,4 +318,3 @@ class MyCollectionController extends AbstractController
             ['message' => 'delete successful']
         );
     }
-}

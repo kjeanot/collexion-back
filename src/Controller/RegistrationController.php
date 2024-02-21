@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class RegistrationController extends AbstractController
 {
-    #[Route('/api/register', name: 'app_register',methods: ['POST'])]
+    #[Route('/register', name: 'app_register',methods: ['POST'])]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher,EntityManagerInterface $entityManager,SerializerInterface $serializer): Response
     {
         $userRequest = $serializer->deserialize($request->getContent(), User::class, 'json');
@@ -22,6 +22,7 @@ class RegistrationController extends AbstractController
         $user->setNickname($userRequest->getNickname());
         $user->setEmail($userRequest->getEmail());
         $user->setPassword($userPasswordHasher->hashPassword($user, $userRequest->getPassword()));
+        $user->setRoles(['ROLE_USER']);
 
         $entityManager->persist($user);
         $entityManager->flush();

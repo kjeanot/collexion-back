@@ -7,10 +7,12 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/back/user')]
 class UserController extends AbstractController
@@ -24,7 +26,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/new', name: 'app_back_user_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher,SluggerInterface $slugger): Response
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -38,8 +40,30 @@ class UserController extends AbstractController
                 // De cette entité je recupère le mdp
                 $user->getPassword()
                 );
+                $imageName = $form->get('image')->getData();
+            
+            if ($imageName) {
+                $originalFilename = pathinfo($imageName->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = uniqid().'.'.$safeFilename.'.'.$imageName->guessExtension();
+            
+                // Move the file to the directory where brochures are stored
+                try {
+                    $imageName->move(
+                        $this->getParameter('images_categories'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'imageNamename' property to store the PDF file name
+                // instead of its contents
+                $user->setimage($newFilename);
+            }
                 // Je redéfinis le mot de passe de $user et je lui donne la valeur du mdp hashé
-                $user->setPassword($hashedPassword);
+            $user->setPassword($hashedPassword);
             $entityManager->persist($user);
             $entityManager->flush();
 
@@ -61,7 +85,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_back_user_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, User $user, EntityManagerInterface $entityManager,UserPasswordHasherInterface $passwordHasher): Response
+    public function edit(Request $request, User $user, EntityManagerInterface $entityManager,UserPasswordHasherInterface $passwordHasher,SluggerInterface $slugger): Response
     {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
@@ -72,6 +96,28 @@ class UserController extends AbstractController
                 $user,
                 $user->getPassword()
             );
+            $imageName = $form->get('image')->getData();
+            
+            if ($imageName) {
+                $originalFilename = pathinfo($imageName->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = uniqid().'.'.$safeFilename.'.'.$imageName->guessExtension();
+            
+                // Move the file to the directory where brochures are stored
+                try {
+                    $imageName->move(
+                        $this->getParameter('images_categories'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'imageNamename' property to store the PDF file name
+                // instead of its contents
+                $user->setimage($newFilename);
+            }
             // Je redéfinis le mot de passe de $user et je lui donne la valeur du mdp hashé
             $user->setPassword($hashedPassword);
             $entityManager->flush();
