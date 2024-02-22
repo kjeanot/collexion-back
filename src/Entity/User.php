@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\Validator\Constraints as SecurityAssert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
@@ -21,12 +22,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Assert\Type('integer')]
-    #[Groups(['get_collections', 'get_users','get_object','get_user','get_collection'])]
+    #[Groups(['get_collections', 'get_users','get_user','get_collection','get_page_object'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Assert\Email(message: 'The email {{ value }} is not a valid email.')]
-    #[Groups(['get_users','get_object','get_user'])]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Email]
+    #[Groups(['get_users','get_user','get_collection_random'])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -37,20 +38,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank,Assert\NotNull,SecurityAssert\UserPassword]
     #[Groups(['get_user'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_collections', 'get_users','get_object','get_user','get_collection'])]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Type('string'),Assert\Length(min: 3, max: 20)]
+    #[Groups(['get_collections', 'get_users','get_user','get_collection','get_collection_random','get_page_object'])]
     private ?string $nickname = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['get_users','get_object','get_user'])]
+    #[Assert\Length(min: 10, max: 1000),Assert\Type('string')]
+    #[Groups(['get_users','get_user'])]
     private ?string $description = null;
 
 
     #[ORM\Column(length: 2083,nullable: true)]
-    #[Groups(['get_objects','get_collections','object'])]
+    #[Assert\Image]
+    #[Groups(['get_objects','get_collections','object','get_collection_random','get_page_object'])]
     private ?string $image = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: MyCollection::class, orphanRemoval: true)]

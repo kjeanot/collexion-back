@@ -255,7 +255,7 @@ class MyCollectionController extends AbstractController
             // header
             [],
             // groups authorized
-            ['groups' => 'get_collections']
+            ['groups' => 'get_collection_random']
         );
     }
     #[Route('/add/{id}/favorite', name: 'api_add_collection_favorite',methods: ['POST'])]

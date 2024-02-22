@@ -6,12 +6,13 @@ use App\Entity\Comment;
 use App\Repository\CommentRepository;
 use App\Repository\MyObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 // all comment avialable on MyCollectionController
 #[Route('/api')]
@@ -74,7 +75,7 @@ class CommentController extends AbstractController
     * @return Response
     */
     #[Route('/comment', name: 'api_comment_create',methods: ['POST'])]
-    public function create(EntityManagerInterface $entityManager, MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request)
+    public function create(EntityManagerInterface $entityManager, MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, ValidatorInterface $validator)
     {
     $jsonData = json_decode($request->getContent(), true);
     $comment = $serializer->deserialize($request->getContent(), Comment::class, 'json');
@@ -86,7 +87,7 @@ class CommentController extends AbstractController
         return $this->json(['message' => 'Object not found'], 404);
     }
 
-    $validator = Validation::createValidator();
+    
     $violations = $validator->validate($comment);
 
     if (0 !== count($violations)) {
@@ -111,7 +112,7 @@ class CommentController extends AbstractController
     * @return Response
     */
     #[Route('/comment/{id}', name: 'api_comment_update',methods: ['PUT'])]
-    public function update(Comment $comment = null, EntityManagerInterface $entityManager,MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request): Response
+    public function update(Comment $comment = null, EntityManagerInterface $entityManager,MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, ValidatorInterface $validator): Response
     {
         // check if $comment doesn't exist
         if (!$comment) {
@@ -132,8 +133,7 @@ class CommentController extends AbstractController
         if (!$updateMyObject) {
             return $this->json(['message' => 'Object not found'], 404);
         }
-
-        $validator = Validation::createValidator();
+        
         $violations = $validator->validate($updateComment);
 
         if (0 !== count($violations)) {

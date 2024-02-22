@@ -18,56 +18,55 @@ class MyObject
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Assert\Type('integer')]
-    #[Groups(['get_objects','get_collections','object','get_object','get_collection','get_categorie_childs'])]
+    #[Groups(['get_objects','get_collections','object','get_collection','get_categorie_childs','get_page_object'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
-    #[Assert\NotNull]
-    #[Assert\Type('string')]
-    #[Assert\Length(min: 3, max: 40)]
-    #[Groups(['get_objects','get_collections','object','get_object','get_collection','get_categorie_childs'])]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Type('string'),Assert\Length(min: 3, max: 40)]
+    #[Groups(['get_objects','get_collections','object','get_collection','get_categorie_childs','get_page_object'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_objects','object','get_object'])]
+    #[Groups(['get_objects','object'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 2083)]
     #[Assert\NotBlank,Assert\NotNull,Assert\Image]
-    #[Groups(['get_objects','get_collections','object','get_object','get_collection','get_categorie_childs'])]
+    #[Groups(['get_objects','get_collections','object','get_collection','get_categorie_childs','get_page_object'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['get_objects','object','get_object','get_categorie_childs'])]
+    #[Groups(['get_objects','object','get_categorie_childs','get_page_object'])]
     #[Assert\NotBlank,Assert\NotNull,Assert\Length(min: 30, max: 1000),Assert\Type('string')]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank,Assert\NotNull,Assert\Length(min: 5, max: 20),Assert\Type('string')]
-    #[Groups(['get_objects','object','get_object','get_categorie_childs'])]
+    #[Groups(['get_objects','object','get_categorie_childs','get_page_object'])]
     private ?string $state = null;
-
-    #[ORM\ManyToMany(targetEntity: MyCollection::class, mappedBy: 'myobjects', cascade: ['persist'])]
-    #[Groups(['get_object'])]
-    private Collection $myCollections;
-
-    #[ORM\OneToMany(mappedBy: 'myObject', targetEntity: Comment::class, orphanRemoval: true)]
-    #[Groups(['get_object'])]
-    private Collection $comments;
-
-    #[ORM\ManyToOne(inversedBy: 'objects')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get_object'])]
-    private ?Category $category = null;
 
     #[ORM\Column]
     #[Assert\Type('datetimeImmutable')]
+    #[Groups(['get_objects','object','get_categorie_childs','get_page_object'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]
     #[Assert\Type('datetimeImmutable')]
+    #[Groups(['get_objects','object','get_categorie_childs','get_page_object'])]
     private ?\DateTimeImmutable $updated_at = null;
+
+    #[ORM\ManyToOne(inversedBy: 'objects')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get_object','get_page_object'])]
+    private ?Category $category = null;
+
+    #[ORM\ManyToMany(targetEntity: MyCollection::class, mappedBy: 'myobjects', cascade: ['persist'])]
+    #[Groups(['get_page_object'])]
+    private Collection $myCollections;
+
+    #[ORM\OneToMany(mappedBy: 'myObject', targetEntity: Comment::class, orphanRemoval: true)]
+    #[Groups(['get_object','get_page_object'])]
+    private Collection $comments;
 
     public function __construct()
     {

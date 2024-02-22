@@ -17,38 +17,34 @@ class MyCollection
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Assert\Type('integer')]
-    #[Groups(['get_collections', 'collection','get_object','get_user','get_collection','get_favorite'])]
+    #[Groups(['get_collections', 'collection','get_user','get_collection','get_favorite','get_collection_random','get_page_object'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
-    #[Assert\NotNull]
-    #[Assert\Type('string')]
-    #[Assert\Length(min: 3, max: 40)]
-    #[Groups(['get_collections','collection','get_object','get_user','get_collection','get_favorite'])]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Type('string'),Assert\Length(min: 3, max: 40)]
+    #[Groups(['get_collections','collection','get_user','get_collection','get_favorite','get_collection_random','get_page_object'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 2083)]
     #[Assert\NotBlank,Assert\NotNull,Assert\Image]
-    #[Groups(['get_collections','collection','get_object','get_user','get_collection','get_favorite'])]
+    #[Groups(['get_collections','collection','get_user','get_collection','get_favorite','get_collection_random','get_page_object'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank,Assert\NotNull,Assert\Length(min: 30, max: 2000),Assert\Type('string')]
-    #[Groups(['get_collections','collection','get_object','get_collection','get_favorite'])]
+    #[Groups(['get_collections','collection','get_collection','get_favorite','get_collection_random','get_page_object'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true,type: Types::DECIMAL, precision: 2, scale: 1)]
-    #[Groups(['get_collections','collection','get_object','get_collection','get_favorite'])]
+    #[Groups(['get_collections','collection','get_collection','get_favorite','get_collection_random','get_page_object'])]
     private ?string $rating = null;
 
     #[ORM\ManyToOne(inversedBy: 'mycollections')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get_collections','get_collection'])]
+    #[Groups(['get_collections','get_collection','get_page_object'])]
     private ?User $user = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'myfavoritescollections')]
-    #[Groups(['get_object'])]
     private Collection $users;
 
     #[ORM\ManyToMany(targetEntity: MyObject::class, inversedBy: 'myCollections')]
@@ -57,11 +53,11 @@ class MyCollection
 
     #[ORM\Column]
     #[Groups(['get_collections','get_favorite',])]
-    #[Assert\Type('datetimeImmutable')]
+    #[Assert\Type('datetimeImmutable','get_collection_random')]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\Type('datetimeImmutable')]
+    #[Assert\Type('datetimeImmutable','get_collection_random')]
     private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\Column]

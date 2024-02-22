@@ -15,16 +15,17 @@ class Comment
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Assert\Type('integer')]
-    #[Groups(['get_comments', 'comment','get_object'])]
+    #[Groups(['get_comments', 'comment','get_object','get_page_object'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['get_comments', 'comment','get_object'])]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Length(min: 5, max: 500),Assert\Type('string')]
+    #[Groups(['get_comments', 'comment','get_object','get_page_object'])]
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get_object'])]
+    #[Groups(['get_object','get_page_object'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]

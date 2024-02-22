@@ -58,13 +58,14 @@ public function findRandomCollectionSql()
  $conn = $this->getEntityManager()->getConnection();
 
  $sql = '
- SELECT *
- FROM my_collection
+ SELECT mc.* , u.id  , u.nickname, u.image
+ FROM my_collection AS mc
+ INNER JOIN user AS u
  ORDER BY RAND()
- LIMIT 1
+ LIMIT 3
      ';
  $resultSet = $conn->executeQuery($sql);
- return $resultSet->fetchAssociative();
+ return $resultSet->fetchAllAssociative();
 }
 
     /*

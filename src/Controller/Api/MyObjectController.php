@@ -69,7 +69,7 @@ class MyObjectController extends AbstractController
             $myObject,
             200,
             ['Access-Control-Allow-Origin' => '*'],
-            ['groups' => 'get_object']
+            ['groups' => 'get_page_object']
             );
     } 
 
@@ -122,7 +122,7 @@ class MyObjectController extends AbstractController
             $myObject->addMyCollection($collectionToAdd);
         }
     }
-
+    
     $violations = $validator->validate($myObject);
 
     if (0 !== count($violations)) {

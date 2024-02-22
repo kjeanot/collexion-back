@@ -13,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 // root URL for all routes from MyCollectionController
 #[Route('/api')]
@@ -89,7 +89,7 @@ class UserController extends AbstractController
     * @return Response
     */
     #[Route('/user/{id}', name: 'api_user_update',methods: ['PUT'])]
-    public function update(User $user = null,Request $request, EntityManagerInterface $entityManager,SerializerInterface $serializer,  UserPasswordHasherInterface $passwordHasher): Response
+    public function update(User $user = null,Request $request, EntityManagerInterface $entityManager,SerializerInterface $serializer,  UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator): Response
     {
         // check if $user doesn't exist
         if (!$user) {
@@ -114,10 +114,15 @@ class UserController extends AbstractController
         $user->setPassword($hashedPassword);
     }
 
-        $entityManager->flush();
- 
-        return $this->json(['message' => 'updated successful', 200]);
- 
+    $violations = $validator->validate($user);
+    if (0 !== count($violations)) {
+        return $this->json([$violations,500,['message' => 'error']]); ;
+        } else{
+
+            $entityManager->flush();
+    
+            return $this->json(['message' => 'updated successful', 200]);
+        }
     }
 
     /**
@@ -150,7 +155,7 @@ class UserController extends AbstractController
     public function upload(Request $request, UserRepository $userRepository, ParameterBagInterface $params,User $user, EntityManagerInterface $manager)
     {
         // for test only in the back side
-        $user = $userRepository->find(15);
+        // $user = $userRepository->find(15);
 
         $image = $request->files->get('file');
 				
