@@ -8,6 +8,7 @@ use App\Repository\MyCollectionRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MyCollectionRepository::class)]
 class MyCollection
@@ -19,14 +20,17 @@ class MyCollection
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank,Assert\NotNull]
     #[Groups(['get_collections','collection','get_object','get_user','get_collection','get_favorite'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 2083)]
+    #[Assert\NotBlank,Assert\NotNull]
     #[Groups(['get_collections','collection','get_object','get_user','get_collection','get_favorite'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank,Assert\NotNull]
     #[Groups(['get_collections','collection','get_object','get_collection','get_favorite'])]
     private ?string $description = null;
 
@@ -55,6 +59,7 @@ class MyCollection
     private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Type('integer')]
     private ?bool $is_active = null;
 
     public function __construct()

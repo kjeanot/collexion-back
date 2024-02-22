@@ -9,6 +9,7 @@ use App\Repository\MyObjectRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\MyCollectionRepository;
+use DateTimeImmutable;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -134,7 +135,6 @@ class MyCollectionController extends AbstractController
     #[Route('/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
 
     public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer, Request $request,MyObjectRepository $myObjectRepository): Response
-
     {
         
         // check if $myCollection doesn't exist
@@ -162,6 +162,7 @@ class MyCollectionController extends AbstractController
             $myCollection->setName($updateMyCollection->getName());
             $myCollection->setDescription($updateMyCollection->getDescription());
             $myCollection->setImage($updateMyCollection->getImage());
+            $myCollection->setUpdatedAt(New DateTimeImmutable());
             $myCollection->setIsActive($updateMyCollection->isIsActive());
             foreach ($myObjectId as $object) {
                 $objectId = $object['id'];

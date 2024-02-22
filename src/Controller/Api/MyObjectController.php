@@ -7,6 +7,7 @@ use App\Entity\MyObject;
 use App\Repository\CategoryRepository;
 use App\Repository\MyCollectionRepository;
 use App\Repository\MyObjectRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -154,6 +155,7 @@ class MyObjectController extends AbstractController
             $myObject->setTitle($updateMyObject->getTitle());
             $myObject->setDescription($updateMyObject->getDescription());
             $myObject->setImage($updateMyObject->getImage());
+            $myObject->setUpdatedAt(New DateTimeImmutable());
             $myObject->setState($updateMyObject->getState());
             foreach ($myCollectionId as $collection) {
                 $collectionId = $collection['id'];
