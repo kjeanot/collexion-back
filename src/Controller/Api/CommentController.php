@@ -74,7 +74,7 @@ class CommentController extends AbstractController
     * @param CommentRepository $commentRepository
     * @return Response
     */
-    #[Route('/comment', name: 'api_comment_create',methods: ['POST'])]
+    #[Route('/secure/comment', name: 'api_comment_create',methods: ['POST'])]
     public function create(EntityManagerInterface $entityManager, MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, ValidatorInterface $validator)
     {
     $jsonData = json_decode($request->getContent(), true);
@@ -111,7 +111,7 @@ class CommentController extends AbstractController
     * @param CommentRepository $commentRepository
     * @return Response
     */
-    #[Route('/comment/{id}', name: 'api_comment_update',methods: ['PUT'])]
+    #[Route('/secure/comment/{id}', name: 'api_comment_update',methods: ['PUT'])]
     public function update(Comment $comment = null, EntityManagerInterface $entityManager,MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, ValidatorInterface $validator): Response
     {
         // check if $comment doesn't exist
@@ -156,7 +156,7 @@ class CommentController extends AbstractController
     * @param CommentRepository $commentRepository
     * @return Response
     */
-    #[Route('/comment/{id}', name: 'api_comment_delete', methods: ['DELETE'])]
+    #[Route('/secure/comment/{id}', name: 'api_comment_delete', methods: ['DELETE'])]
     public function delete(Comment $comment = null , EntityManagerInterface $entityManager): Response
     {
          // check if $comment doesn't exist

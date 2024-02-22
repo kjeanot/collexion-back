@@ -93,7 +93,7 @@ class MyCollectionController extends AbstractController
     * @param MyCollectionRepository $myCollectionRepository
     * @return Response
     */
-   #[Route('/collection', name: 'api_my_collection_create',methods: ['POST'])]
+   #[Route('/secure/collection', name: 'api_my_collection_create',methods: ['POST'])]
    public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator)
    {
 
@@ -127,7 +127,7 @@ class MyCollectionController extends AbstractController
     * @param MyCollectionRepository $myCollectionRepository
     * @return Response
     */
-    #[Route('/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
+    #[Route('/secure/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
 
     public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer, Request $request,MyObjectRepository $myObjectRepository, ValidatorInterface $validator): Response
     {
@@ -177,7 +177,7 @@ class MyCollectionController extends AbstractController
     * @param MyCollectionRepository $myCollectionRepository
     * @return Response
     */
-    #[Route('/collection/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
+    #[Route('/secure/collection/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
     public function delete(MyCollection $myCollection, EntityManagerInterface $manager): Response
     {
          // check if $myCollection doesn't exist
@@ -198,7 +198,7 @@ class MyCollectionController extends AbstractController
     /**
      * @Route("/uploadFile", name="upload", methods={"POST"})
      */
-    #[Route('/collection/upload_file', name: 'api_collection_upload_file', methods: ['POST'])]
+    #[Route('/secure/collection/upload_file', name: 'api_collection_upload_file', methods: ['POST'])]
     public function upload(Request $request, MyCollectionRepository $myCollectionRepository, ParameterBagInterface $params, MyCollection $myCollection,EntityManagerInterface $manager)
     {
         // for test only in the back side
@@ -258,7 +258,7 @@ class MyCollectionController extends AbstractController
             ['groups' => 'get_collection_random']
         );
     }
-    #[Route('/add/{id}/favorite', name: 'api_add_collection_favorite',methods: ['POST'])]
+    #[Route('/secure/add/{id}/favorite', name: 'api_add_collection_favorite',methods: ['POST'])]
     public function newFavorite(MyCollection $myCollection = null, EntityManagerInterface $entityManager,): Response
     {
         // check if $myCollection doesn't exist
@@ -289,7 +289,7 @@ class MyCollectionController extends AbstractController
         );
     }
 
-        #[Route('/delete/{id}/favorite', name: 'api_delete_collection_favorite',methods: ['POST'])]
+        #[Route('/secure/delete/{id}/favorite', name: 'api_delete_collection_favorite',methods: ['POST'])]
     public function deleteFavorite(MyCollection $myCollection = null, EntityManagerInterface $entityManager): Response
     {
         // check if $myCollection doesn't exist

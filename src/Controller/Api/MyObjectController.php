@@ -79,7 +79,7 @@ class MyObjectController extends AbstractController
     * @param MyObjectRepository $myObjectRepository
     * @return Response
     */
-   #[Route('/object', name: 'api_my_object_create',methods: ['POST'])]
+   #[Route('/secure/object', name: 'api_my_object_create',methods: ['POST'])]
    public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator, Category $category = null, CategoryRepository $categoryRepository, MyCollectionRepository $myCollectionRepository,)
    {
 
@@ -141,7 +141,7 @@ class MyObjectController extends AbstractController
     * @param MyObjectRepository $myObjectRepository
     * @return Response
     */
-    #[Route('/object/{id}', name: 'api_my_object_update',methods: ['PUT'])]
+    #[Route('/secure/object/{id}', name: 'api_my_object_update',methods: ['PUT'])]
     public function update(MyObject $myObject = null, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, SerializerInterface $serializer , Request $request, MyCollectionRepository $myCollectionRepository, ValidatorInterface $validator): Response
     {
         if (!$myObject) {
@@ -198,7 +198,7 @@ class MyObjectController extends AbstractController
     * @param MyObjectRepository $myObjectRepository
     * @return Response
     */
-    #[Route('/object/{id}', name: 'api_my_object_delete', methods: ['DELETE'])]
+    #[Route('/secure/object/{id}', name: 'api_my_object_delete', methods: ['DELETE'])]
     public function delete(MyObject $Object, EntityManagerInterface $manager): Response
     {
         if (!$Object) {
@@ -215,7 +215,7 @@ class MyObjectController extends AbstractController
        
     }
 
-    #[Route('/object/upload_file', name: 'api_object_upload_file', methods: ['POST'])]
+    #[Route('/secure/object/upload_file', name: 'api_object_upload_file', methods: ['POST'])]
     public function upload(Request $request, ParameterBagInterface $params, MyObject $myObject,EntityManagerInterface $manager)
     {
         // for test only in the back side

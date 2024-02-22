@@ -88,7 +88,7 @@ class UserController extends AbstractController
     * @param UserRepository $userRepository
     * @return Response
     */
-    #[Route('/user/{id}', name: 'api_user_update',methods: ['PUT'])]
+    #[Route('/secure/user/{id}', name: 'api_user_update',methods: ['PUT'])]
     public function update(User $user = null,Request $request, EntityManagerInterface $entityManager,SerializerInterface $serializer,  UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator): Response
     {
         // check if $user doesn't exist
@@ -131,7 +131,7 @@ class UserController extends AbstractController
     * @param UserRepository $userRepository
     * @return Response
     */
-    #[Route('/user/{id}', name: 'api_user_delete', methods: ['DELETE'])]
+    #[Route('/secure/user/{id}', name: 'api_user_delete', methods: ['DELETE'])]
     public function delete(User $user = null , EntityManagerInterface $entityManager): Response
     {
          // check if $user doesn't exist
@@ -151,7 +151,7 @@ class UserController extends AbstractController
     }
 
 
-    #[Route('/user/upload_file', name: 'api_user_upload_file', methods: ['POST'])]
+    #[Route('/secure/user/upload_file', name: 'api_user_upload_file', methods: ['POST'])]
     public function upload(Request $request, UserRepository $userRepository, ParameterBagInterface $params,User $user, EntityManagerInterface $manager)
     {
         // for test only in the back side
