@@ -9,6 +9,7 @@ use App\Repository\MyCollectionRepository;
 use App\Repository\MyObjectRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Lcobucci\JWT\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 // all comment avialable on MyCollectionController
 #[Route('/api')]
@@ -78,12 +80,11 @@ class MyObjectController extends AbstractController
     * @return Response
     */
    #[Route('/object', name: 'api_my_object_create',methods: ['POST'])]
-   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, Category $category = null, CategoryRepository $categoryRepository, MyCollectionRepository $myCollectionRepository)
+   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator, Category $category = null, CategoryRepository $categoryRepository, MyCollectionRepository $myCollectionRepository,)
    {
 
     $jsonData = json_decode($request->getContent(), true);
-    $myObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
-   
+    $myNewObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
 
     $categoryId = $jsonData['relatedCategory'];
     $category = $categoryRepository->find($categoryId);
@@ -94,20 +95,39 @@ class MyObjectController extends AbstractController
 
     $myCollectionId = $jsonData['relatedMyCollections'];
 
-    $validator = Validation::createValidator();
+
+    $myNewObject->setCategory($category);
+    foreach ($myCollectionId as $collection) {
+        $collectionId = $collection['id'];
+        $collectionToAdd = $myCollectionRepository->find($collectionId);
+        if ($collectionToAdd) {
+            $myNewObject->addMyCollection($collectionToAdd);
+        } else {
+            return $this->json(['message' => 'Collection not found'], 404);
+        }
+    }
+
+    $myObject = new MyObject();
+    $myObject->setCategory($category);
+    $myObject->setName($myNewObject->getName());
+    $myObject->setTitle($myNewObject->getTitle());
+    $myObject->setDescription($myNewObject->getDescription());
+    $myObject->setImage($myNewObject->getImage());
+    $myObject->setUpdatedAt(New DateTimeImmutable());
+    $myObject->setState($myNewObject->getState());
+    foreach ($myCollectionId as $collection) {
+        $collectionId = $collection['id'];
+        $collectionToAdd = $myCollectionRepository->find($collectionId);
+        if ($collectionToAdd) {
+            $myObject->addMyCollection($collectionToAdd);
+        }
+    }
+
     $violations = $validator->validate($myObject);
 
     if (0 !== count($violations)) {
         return $this->json([$violations, 500, ['message' => 'error']]);
     } else {
-        $myObject->setCategory($category);
-        foreach ($myCollectionId as $collection) {
-            $collectionId = $collection['id'];
-            $collectionToAdd = $myCollectionRepository->find($collectionId);
-            if ($collectionToAdd) {
-                $myObject->addMyCollection($collectionToAdd);
-            }
-        }
         $entityManager->persist($myObject);
         $entityManager->flush();
 
@@ -122,52 +142,52 @@ class MyObjectController extends AbstractController
     * @return Response
     */
     #[Route('/object/{id}', name: 'api_my_object_update',methods: ['PUT'])]
-    public function update(MyObject $myObject = null, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, SerializerInterface $serializer , Request $request, MyCollectionRepository $myCollectionRepository): Response
+    public function update(MyObject $myObject = null, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, SerializerInterface $serializer , Request $request, MyCollectionRepository $myCollectionRepository, ValidatorInterface $validator): Response
     {
         if (!$myObject) {
             return $this->json(
-                "Error : Collection inexistante",
+                "Error : Objet inexistant",
                 404
             );
         }
 
         $jsonData = json_decode($request->getContent(), true);
-
         $updateMyObject = $serializer->deserialize($request->getContent(), MyObject::class, 'json');
 
         $categoryId = $jsonData['relatedCategory'];
-        $myCollectionId = $jsonData['relatedMyCollections'];
-        
         $updateCategory = $categoryRepository->find($categoryId);
 
         if (!$updateCategory) {
             return $this->json(['message' => 'Category not found'], 404);
         }
 
-        $validator = Validation::createValidator();
-        $violations = $validator->validate($updateMyObject);
+        $myCollectionId = $jsonData['relatedMyCollections'];
+
+        $myObject->setCategory($updateCategory);
+        $myObject->setName($updateMyObject->getName());
+        $myObject->setTitle($updateMyObject->getTitle());
+        $myObject->setDescription($updateMyObject->getDescription());
+        $myObject->setImage($updateMyObject->getImage());
+        $myObject->setUpdatedAt(New DateTimeImmutable());
+        $myObject->setState($updateMyObject->getState());
+
+        foreach ($myCollectionId as $collection) {
+            $collectionId = $collection['id'];
+            $collectionToAdd = $myCollectionRepository->find($collectionId);
+            if ($collectionToAdd) {
+                $myObject->addMyCollection($collectionToAdd);
+            } else {
+                return $this->json(['message' => 'Collection not found'], 404);
+            }
+        }
+
+        $violations = $validator->validate($myObject);
 
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
         } else{
-            $myObject->setCategory($updateCategory);
-            $myObject->setName($updateMyObject->getName());
-            $myObject->setTitle($updateMyObject->getTitle());
-            $myObject->setDescription($updateMyObject->getDescription());
-            $myObject->setImage($updateMyObject->getImage());
-            $myObject->setUpdatedAt(New DateTimeImmutable());
-            $myObject->setState($updateMyObject->getState());
-            foreach ($myCollectionId as $collection) {
-                $collectionId = $collection['id'];
-               
-                $collectionToAdd = $myCollectionRepository->find($collectionId);
-                if ($collectionToAdd) {
-                    $myObject->addMyCollection($collectionToAdd);
-                }
-            }
 
             $entityManager->flush();
-
             return $this->json($serializer->serialize($myObject, 'json', ['groups' => 'object']), 200, ['message' => 'update successful']);
         }
     }
