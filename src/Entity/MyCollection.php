@@ -16,11 +16,12 @@ class MyCollection
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Assert\Type('integer')]
     #[Groups(['get_collections', 'collection','get_object','get_user','get_collection','get_favorite'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank,Assert\NotNull]
+    #[Assert\NotBlank,Assert\NotNull, Assert\Type('string'),Assert\Length(min: 3, max: 40)]
     #[Groups(['get_collections','collection','get_object','get_user','get_collection','get_favorite'])]
     private ?string $name = null;
 
@@ -59,7 +60,7 @@ class MyCollection
     private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank,Assert\NotNull,Assert\Type('integer')]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Type('bool')]
     private ?bool $is_active = null;
 
     public function __construct()

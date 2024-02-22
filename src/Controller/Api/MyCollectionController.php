@@ -210,26 +210,34 @@ class MyCollectionController extends AbstractController
     public function upload(Request $request, MyCollectionRepository $myCollectionRepository, ParameterBagInterface $params, MyCollection $myCollection,EntityManagerInterface $manager)
     {
         // for test only in the back side
-         $myCollection = $myCollectionRepository->find(19);
+         $myCollection = $myCollectionRepository->find(2);
 
         $image = $request->files->get('file');
-        
-        // enregistrement de l'image dans le dossier public du serveur
-        // paramas->get('public') =>  va chercher dans services.yaml la variable public
-        $image->move($params->get('images_collections'), $image->getClientOriginalName());
-				
-        // on ajoute uniqid() afin de ne pas avoir 2 fichiers avec le même nom
-        $newFilename = uniqid().'.'. $image->getClientOriginalName();
 
-        // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
-		// $entity est l'entity qui doit recevoir votre image
-		$myCollection->setImage($newFilename);
+        $validator = Validation::createValidator();
+        $violations = $validator->validate($image);
 
-        $manager->flush();
+        if (0 !== count($violations)) {
+            return $this->json([$violations,500,['message' => 'error']]); ;
+        } else{
+           
+            // on ajoute uniqid() afin de ne pas avoir 2 fichiers avec le même nom
+            $newFilename = uniqid().'.'. $image->getClientOriginalName();
 
-        return $this->json([
-            'message' => 'Image uploaded successfully.'
-        ]);
+             // enregistrement de l'image dans le dossier public du serveur
+            // paramas->get('public') =>  va chercher dans services.yaml la variable public
+            $image->move($params->get('images_collections'), $newFilename);
+
+            // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
+            // $entity est l'entity qui doit recevoir votre image
+            $myCollection->setImage($newFilename);
+
+            $manager->flush();
+
+            return $this->json([
+                'message' => 'Image uploaded successfully.'
+            ]);
+        }
     } 
     #[Route('/collection_random', name: 'api_my_collection_random',methods: ['GET'])]
     public function random(MyCollectionRepository $myCollectionRepository): Response

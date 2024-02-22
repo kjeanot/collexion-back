@@ -202,13 +202,13 @@ class MyObjectController extends AbstractController
         //  $myObject = $myObjectRepository->find(4);
 
         $image = $request->files->get('file');
-        
-        // enregistrement de l'image dans le dossier public du serveur
-        // paramas->get('public') =>  va chercher dans services.yaml la variable public
-        $image->move($params->get('images_objects'), $image->getClientOriginalName());
-				
+        				
         // on ajoute uniqid() afin de ne pas avoir 2 fichiers avec le même nom
         $newFilename = uniqid().'.'. $image->getClientOriginalName();
+
+         // enregistrement de l'image dans le dossier public du serveur
+        // paramas->get('public') =>  va chercher dans services.yaml la variable public
+        $image->move($params->get('images_objects'), $newFilename);
 
         // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
 		// $entity est l'entity qui doit recevoir votre image
