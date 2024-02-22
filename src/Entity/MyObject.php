@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MyObjectRepository::class)]
 class MyObject
@@ -16,6 +17,7 @@ class MyObject
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Assert\Type('integer')]
     #[Groups(['get_objects','get_collections','object','get_object','get_collection','get_categorie_childs'])]
     private ?int $id = null;
 

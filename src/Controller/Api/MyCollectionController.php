@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 // root URL for all routes from MyCollectionController
 #[Route('/api')]
@@ -93,31 +94,25 @@ class MyCollectionController extends AbstractController
     * @return Response
     */
    #[Route('/collection', name: 'api_my_collection_create',methods: ['POST'])]
-   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, MyObjectRepository $myObjectRepository)
+   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator)
    {
 
-    // $jsonData = json_decode($request->getContent(), true);
+    $updateMyCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
 
-    $myCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
-    // dd($myCollection);
+    $myCollection = new MyCollection();
 
-    // $myObjectId = $jsonData['myobjects'];
+    $myCollection->setUser($this->getUser());
+    $myCollection->setName($updateMyCollection->getName());
+    $myCollection->setDescription($updateMyCollection->getDescription());
+    $myCollection->setImage($updateMyCollection->getImage());
+    $myCollection->setUpdatedAt(New DateTimeImmutable());
+    $myCollection->setIsActive($updateMyCollection->isIsActive());
 
-    $validator = Validation::createValidator();
     $violations = $validator->validate($myCollection);
 
     if (0 !== count($violations)) {
         return $this->json([$violations,500,['message' => 'error']]); ;
     } else{
-        // retrieve user
-        $myCollection->setUser($this->getUser());
-        // foreach ($myObjectId as $object) {
-        //     $objectId = $object['id'];
-        //     $objectToAdd = $myObjectRepository->find($objectId);
-        //     if ($objectToAdd) {
-        //         $myCollection->addMyobject($objectToAdd);
-        //     }
-        // }
         
         $entityManager->persist($myCollection);
         $entityManager->flush();
@@ -134,7 +129,7 @@ class MyCollectionController extends AbstractController
     */
     #[Route('/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
 
-    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer, Request $request,MyObjectRepository $myObjectRepository): Response
+    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer, Request $request,MyObjectRepository $myObjectRepository, ValidatorInterface $validator): Response
     {
         
         // check if $myCollection doesn't exist
@@ -151,32 +146,29 @@ class MyCollectionController extends AbstractController
         $updateMyCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
         // retrieve related objects
         $myObjectId = $jsonData['relatedObjects'];
-        // validate data
-        $validator = Validation::createValidator();
-        $violations = $validator->validate($updateMyCollection);
+
+        $myCollection->setUser($this->getUser());
+        $myCollection->setName($updateMyCollection->getName());
+        $myCollection->setDescription($updateMyCollection->getDescription());
+        $myCollection->setImage($updateMyCollection->getImage());
+        $myCollection->setUpdatedAt(New DateTimeImmutable());
+        $myCollection->setIsActive($updateMyCollection->isIsActive());
+        foreach ($myObjectId as $object) {
+            $objectId = $object['id'];
+            $objectToRemove = $myObjectRepository->find($objectId);
+            if ($objectToRemove) {
+                $myCollection->removeMyobject($objectToRemove);
+            }
+        }
+
+        $violations = $validator->validate($myCollection);
         // if there is an error
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
-        } else{
-            $myCollection->setUser($this->getUser());
-            $myCollection->setName($updateMyCollection->getName());
-            $myCollection->setDescription($updateMyCollection->getDescription());
-            $myCollection->setImage($updateMyCollection->getImage());
-            $myCollection->setUpdatedAt(New DateTimeImmutable());
-            $myCollection->setIsActive($updateMyCollection->isIsActive());
-            foreach ($myObjectId as $object) {
-                $objectId = $object['id'];
-                $objectToRemove = $myObjectRepository->find($objectId);
-                if ($objectToRemove) {
-                    $myCollection->removeMyobject($objectToRemove);
-                }
+        } else {    
+                $entityManager->flush();
+                return $this->json($serializer->serialize($myCollection, 'json', ['groups' => 'collection']), 200, ['message' => 'update successful']);
             }
-            
-            $entityManager->flush();
-
-            return $this->json($serializer->serialize($myCollection, 'json', ['groups' => 'collection']), 200, ['message' => 'update successful']);
-        }
- 
     }
 
     /**

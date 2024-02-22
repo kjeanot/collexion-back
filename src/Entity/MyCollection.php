@@ -21,23 +21,26 @@ class MyCollection
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank,Assert\NotNull, Assert\Type('string'),Assert\Length(min: 3, max: 40)]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Type('string')]
+    #[Assert\Length(min: 3, max: 40)]
     #[Groups(['get_collections','collection','get_object','get_user','get_collection','get_favorite'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 2083)]
-    #[Assert\NotBlank,Assert\NotNull]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Image]
     #[Groups(['get_collections','collection','get_object','get_user','get_collection','get_favorite'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Assert\NotBlank,Assert\NotNull]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Length(min: 30, max: 2000),Assert\Type('string')]
     #[Groups(['get_collections','collection','get_object','get_collection','get_favorite'])]
     private ?string $description = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(nullable: true,type: Types::DECIMAL, precision: 2, scale: 1)]
     #[Groups(['get_collections','collection','get_object','get_collection','get_favorite'])]
-    private ?float $rating = null;
+    private ?string $rating = null;
 
     #[ORM\ManyToOne(inversedBy: 'mycollections')]
     #[ORM\JoinColumn(nullable: false)]
@@ -54,9 +57,11 @@ class MyCollection
 
     #[ORM\Column]
     #[Groups(['get_collections','get_favorite',])]
+    #[Assert\Type('datetimeImmutable')]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Type('datetimeImmutable')]
     private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\Column]
