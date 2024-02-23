@@ -39,7 +39,7 @@ class CommentController extends AbstractController
         return $this->json(
             $comments,
             200,
-            ['Access-Control-Allow-Origin' => '*'],
+            [],
             ['groups' => 'get_comments']
         );
     }
@@ -63,7 +63,7 @@ class CommentController extends AbstractController
         return $this->json(
             $comment,
             200,
-            ['Access-Control-Allow-Origin' => '*'],
+            [],
             ['groups' => 'get_comments']
             );
     } 
@@ -78,31 +78,31 @@ class CommentController extends AbstractController
     public function create(EntityManagerInterface $entityManager, MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, ValidatorInterface $validator)
     {
     $jsonData = json_decode($request->getContent(), true);
-    $comment = $serializer->deserialize($request->getContent(), Comment::class, 'json');
+    $newComment = $serializer->deserialize($request->getContent(), Comment::class, 'json');
 
     $myObjectId = $jsonData['object'];
     $myObject = $myObjectRepository->find($myObjectId);
 
     if (!$myObject) {
-        return $this->json(['message' => 'Object not found'], 404);
-    }
+            return $this->json(['message' => 'Object not found'], 404);
+        }
 
+    $comment = new Comment();
+    $comment->setUser($this->getUser());
+    $comment->setMyObject($myObject);
+    $comment->setContent($newComment->getContent() );
     
     $violations = $validator->validate($comment);
 
     if (0 !== count($violations)) {
         return $this->json([$violations,500,['message' => 'error']]); ;
-    } else{
-        // retrieve user
-        $comment->setUser($this->getUser());
-        $comment->setMyObject($myObject);
-        $entityManager->persist($comment);
-        $entityManager->flush();
+        } else{
 
-        return $this->json($serializer->serialize($comment, 'json', ['groups' => 'comment']), 201, ['message' => 'create successful']);
-   }
+            $entityManager->persist($comment);
+            $entityManager->flush();
 
-
+            return $this->json($serializer->serialize($comment, 'json', ['groups' => 'comment']), 201, ['message' => 'create successful']);
+        }
     }
 
     /**
@@ -133,21 +133,22 @@ class CommentController extends AbstractController
         if (!$updateMyObject) {
             return $this->json(['message' => 'Object not found'], 404);
         }
+
+        $comment->setUser($this->getUser());
+        $comment->setMyObject($updateMyObject);
+        $comment->setContent($updateComment->getContent());
         
         $violations = $validator->validate($updateComment);
 
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
         } else{
-            $comment->setUser($this->getUser());
-            $comment->setMyObject($updateMyObject);
-            $comment->setContent($updateComment->getContent());
 
             $entityManager->flush();
 
             return $this->json($serializer->serialize($comment, 'json', ['groups' => 'comment']), 200, ['message' => 'update successful']);
         }
- 
+
     }
 
     /**

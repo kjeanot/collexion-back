@@ -46,7 +46,7 @@ class UserController extends AbstractController
             // status code
             200,
             // header
-            ['Access-Control-Allow-Origin' => '*' ],
+            [],
             // groups authorized
             ['groups' => 'get_users']
         );
@@ -76,7 +76,7 @@ class UserController extends AbstractController
             // status code
             200,
             // header
-            ['Access-Control-Allow-Origin' => '*' ],
+            [],
             // groups authorized
             ['groups' => 'get_user']
         );

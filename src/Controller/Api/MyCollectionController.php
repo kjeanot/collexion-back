@@ -51,7 +51,7 @@ class MyCollectionController extends AbstractController
             // status code
             200,
             // header
-            ['Access-Control-Allow-Origin' => '*' ],
+            [],
             // groups authorized
             ['groups' => 'get_collections']
         );
@@ -81,7 +81,7 @@ class MyCollectionController extends AbstractController
             // status code
             200,
             // header
-            ['Access-Control-Allow-Origin' => '*' ],
+            [],
             // groups authorized
             ['groups' => 'get_collection']
             );
