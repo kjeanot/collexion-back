@@ -26,10 +26,6 @@ class MyObject
     #[Groups(['get_objects','get_collections','object','get_collection','get_categorie_childs','get_page_object'])]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['get_objects','object'])]
-    private ?string $title = null;
-
     #[ORM\Column(length: 2083)]
     #[Assert\NotBlank,Assert\NotNull,Assert\Image]
     #[Groups(['get_objects','get_collections','object','get_collection','get_categorie_childs','get_page_object'])]
@@ -89,18 +85,6 @@ class MyObject
     public function setName(string $Name): static
     {
         $this->name = $Name;
-
-        return $this;
-    }
-
-        public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): static
-    {
-        $this->title = $title;
 
         return $this;
     }

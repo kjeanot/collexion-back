@@ -9,7 +9,6 @@ use App\Repository\MyCollectionRepository;
 use App\Repository\MyObjectRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Lcobucci\JWT\Validation\Validator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,7 +44,7 @@ class MyObjectController extends AbstractController
         return $this->json(
             $objects,
             200,
-            ['Access-Control-Allow-Origin' => '*'],
+            [],
             ['groups' => 'get_objects']
         );
     }
@@ -68,7 +67,7 @@ class MyObjectController extends AbstractController
         return $this->json(
             $myObject,
             200,
-            ['Access-Control-Allow-Origin' => '*'],
+            [],
             ['groups' => 'get_page_object']
             );
     } 
@@ -110,7 +109,6 @@ class MyObjectController extends AbstractController
     $myObject = new MyObject();
     $myObject->setCategory($category);
     $myObject->setName($myNewObject->getName());
-    $myObject->setTitle($myNewObject->getTitle());
     $myObject->setDescription($myNewObject->getDescription());
     $myObject->setImage($myNewObject->getImage());
     $myObject->setUpdatedAt(New DateTimeImmutable());
@@ -165,7 +163,6 @@ class MyObjectController extends AbstractController
 
         $myObject->setCategory($updateCategory);
         $myObject->setName($updateMyObject->getName());
-        $myObject->setTitle($updateMyObject->getTitle());
         $myObject->setDescription($updateMyObject->getDescription());
         $myObject->setImage($updateMyObject->getImage());
         $myObject->setUpdatedAt(New DateTimeImmutable());
@@ -263,7 +260,7 @@ class MyObjectController extends AbstractController
             // status code
             200,
             // header
-            ['Access-Control-Allow-Origin' => '*' ],
+            [],
             // groups authorized
             ['groups' => 'get_objects']
         );

@@ -3,7 +3,6 @@
 namespace App\Controller\Api;
 
 use App\Entity\User;
-use App\Entity\Comment;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -106,7 +105,7 @@ class UserController extends AbstractController
     $user->setEmail($userUpdateRequest->getEmail());
     $user->setNickname($userUpdateRequest->getNickname());
     $user->setDescription($userUpdateRequest->getDescription());
-    $user->setImage($userUpdateRequest->getImage());
+    $user->setPicture($userUpdateRequest->getPicture());
     
     // Vérifier et mettre à jour le mot de passe si nécessaire
     if ($userUpdateRequest->getPassword()) {
@@ -155,7 +154,7 @@ class UserController extends AbstractController
     public function upload(Request $request, UserRepository $userRepository, ParameterBagInterface $params,User $user, EntityManagerInterface $manager)
     {
         // for test only in the back side
-        // $user = $userRepository->find(15);
+        // $user = $userRepository->find(1);
 
         $image = $request->files->get('file');
 				
@@ -168,7 +167,7 @@ class UserController extends AbstractController
 
         // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
 		    // $entity est l'entity qui doit recevoir votre image
-		    $user->setImage($newFilename);
+		$user->setPicture($newFilename);
 
         $manager->flush();
 

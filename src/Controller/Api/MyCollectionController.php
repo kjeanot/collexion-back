@@ -3,10 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\MyCollection;
-use App\Entity\MyObject;
-use App\Entity\User;
 use App\Repository\MyObjectRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\MyCollectionRepository;
 use DateTimeImmutable;
