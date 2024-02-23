@@ -22,7 +22,6 @@ class ApiLoginController extends AbstractController
     #[Route('/api/login_check', name: 'api_login', methods: ['POST'])]
     public function index(#[CurrentUser] ?User $user): Response
     {
-
         if (null === $user) {
             return $this->json([
                 'message' => 'identifiants incorrectes',

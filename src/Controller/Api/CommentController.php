@@ -6,12 +6,12 @@ use App\Entity\Comment;
 use App\Repository\CommentRepository;
 use App\Repository\MyObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 // all comment avialable on MyCollectionController
 #[Route('/api')]
@@ -38,7 +38,7 @@ class CommentController extends AbstractController
         return $this->json(
             $comments,
             200,
-            ['Access-Control-Allow-Origin' => '*'],
+            [],
             ['groups' => 'get_comments']
         );
     }
@@ -62,7 +62,7 @@ class CommentController extends AbstractController
         return $this->json(
             $comment,
             200,
-            ['Access-Control-Allow-Origin' => '*'],
+            [],
             ['groups' => 'get_comments']
             );
     } 
@@ -73,35 +73,35 @@ class CommentController extends AbstractController
     * @param CommentRepository $commentRepository
     * @return Response
     */
-    #[Route('/comment', name: 'api_comment_create',methods: ['POST'])]
-    public function create(EntityManagerInterface $entityManager, MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request)
+    #[Route('/secure/comment', name: 'api_comment_create',methods: ['POST'])]
+    public function create(EntityManagerInterface $entityManager, MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, ValidatorInterface $validator)
     {
     $jsonData = json_decode($request->getContent(), true);
-    $comment = $serializer->deserialize($request->getContent(), Comment::class, 'json');
+    $newComment = $serializer->deserialize($request->getContent(), Comment::class, 'json');
 
     $myObjectId = $jsonData['object'];
     $myObject = $myObjectRepository->find($myObjectId);
 
     if (!$myObject) {
-        return $this->json(['message' => 'Object not found'], 404);
-    }
+            return $this->json(['message' => 'Object not found'], 404);
+        }
 
-    $validator = Validation::createValidator();
+    $comment = new Comment();
+    $comment->setUser($this->getUser());
+    $comment->setMyObject($myObject);
+    $comment->setContent($newComment->getContent() );
+    
     $violations = $validator->validate($comment);
 
     if (0 !== count($violations)) {
         return $this->json([$violations,500,['message' => 'error']]); ;
-    } else{
-        // retrieve user
-        $comment->setUser($this->getUser());
-        $comment->setMyObject($myObject);
-        $entityManager->persist($comment);
-        $entityManager->flush();
+        } else{
 
-        return $this->json($serializer->serialize($comment, 'json', ['groups' => 'comment']), 201, ['message' => 'create successful']);
-   }
+            $entityManager->persist($comment);
+            $entityManager->flush();
 
-
+            return $this->json($serializer->serialize($comment, 'json', ['groups' => 'comment']), 201, ['message' => 'create successful']);
+        }
     }
 
     /**
@@ -110,8 +110,8 @@ class CommentController extends AbstractController
     * @param CommentRepository $commentRepository
     * @return Response
     */
-    #[Route('/comment/{id}', name: 'api_comment_update',methods: ['PUT'])]
-    public function update(Comment $comment = null, EntityManagerInterface $entityManager,MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request): Response
+    #[Route('/secure/comment/{id}', name: 'api_comment_update',methods: ['PUT'])]
+    public function update(Comment $comment = null, EntityManagerInterface $entityManager,MyObjectRepository $myObjectRepository, SerializerInterface $serializer, Request $request, ValidatorInterface $validator): Response
     {
         // check if $comment doesn't exist
         if (!$comment) {
@@ -133,21 +133,21 @@ class CommentController extends AbstractController
             return $this->json(['message' => 'Object not found'], 404);
         }
 
-        $validator = Validation::createValidator();
+        $comment->setUser($this->getUser());
+        $comment->setMyObject($updateMyObject);
+        $comment->setContent($updateComment->getContent());
+        
         $violations = $validator->validate($updateComment);
 
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
         } else{
-            $comment->setUser($this->getUser());
-            $comment->setMyObject($updateMyObject);
-            $comment->setContent($updateComment->getContent());
 
             $entityManager->flush();
 
             return $this->json($serializer->serialize($comment, 'json', ['groups' => 'comment']), 200, ['message' => 'update successful']);
         }
- 
+
     }
 
     /**
@@ -156,7 +156,7 @@ class CommentController extends AbstractController
     * @param CommentRepository $commentRepository
     * @return Response
     */
-    #[Route('/comment/{id}', name: 'api_comment_delete', methods: ['DELETE'])]
+    #[Route('/secure/comment/{id}', name: 'api_comment_delete', methods: ['DELETE'])]
     public function delete(Comment $comment = null , EntityManagerInterface $entityManager): Response
     {
          // check if $comment doesn't exist

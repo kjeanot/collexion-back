@@ -6,6 +6,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CommentRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
@@ -13,16 +14,18 @@ class Comment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['get_comments', 'comment','get_object'])]
+    #[Assert\Type('integer')]
+    #[Groups(['get_comments', 'comment','get_object','get_page_object'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['get_comments', 'comment','get_object'])]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Length(min: 5, max: 500),Assert\Type('string')]
+    #[Groups(['get_comments', 'comment','get_object','get_page_object'])]
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get_object'])]
+    #[Groups(['get_object','get_page_object'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]

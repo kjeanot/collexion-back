@@ -3,12 +3,13 @@
 namespace App\Form;
 
 use App\Entity\Category;
-use App\Entity\MyCollection;
 use App\Entity\MyObject;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\MyCollection;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 class MyObjectType extends AbstractType
 {
@@ -17,7 +18,10 @@ class MyObjectType extends AbstractType
         $builder
             ->add('name')
             ->add('title')
-            ->add('image')
+            ->add('image', FileType::class, [
+                'label' => 'Image de la collection',
+                'mapped' => false,
+            ])
             ->add('description')
             ->add('state')
             ->add('myCollections', EntityType::class, [

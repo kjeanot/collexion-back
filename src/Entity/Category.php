@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
@@ -14,11 +15,13 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['get_categories','get_object', 'get_categorie_childs'])]
+    #[Assert\Type('integer')]
+    #[Groups(['get_categories','get_object', 'get_categorie_childs','get_page_object'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get_categories','get_object', 'get_categorie_childs'])]
+    #[Groups(['get_categories','get_object', 'get_categorie_childs','get_page_object'])]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Type('string'),Assert\Length(min: 3, max: 40)]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: MyObject::class, orphanRemoval: true)]
@@ -34,6 +37,7 @@ class Category
 
     #[ORM\Column(length: 2083)]
     #[Groups(['get_categories', 'get_categorie_childs'])]
+    #[Assert\NotBlank,Assert\NotNull,Assert\Image]
     private ?string $image = null;
 
     public function __construct()

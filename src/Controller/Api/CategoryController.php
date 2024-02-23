@@ -33,7 +33,7 @@ class CategoryController extends AbstractController
         return $this->json(
             $categories,
             200,
-            ['Access-Control-Allow-Origin' => '*'],
+            [],
             ['groups' => 'get_categories']
         );
     }
@@ -59,7 +59,7 @@ class CategoryController extends AbstractController
         return $this->json(
             $categoriesParents,
             200,
-            ['Access-Control-Allow-Origin' => '*'],
+            [],
             ['groups' => 'get_categories']
         );
     }
@@ -85,7 +85,7 @@ class CategoryController extends AbstractController
         return $this->json(
             $categoriesChilds,
             200,
-            ['Access-Control-Allow-Origin' => '*'],
+            [],
             ['groups' => 'get_categories']
         );
     }
@@ -112,7 +112,7 @@ class CategoryController extends AbstractController
         return $this->json(
             $category,
             200,
-            ['Access-Control-Allow-Origin' => '*'],
+            [],
             ['groups' => 'get_categorie_childs']
             );
     } 
@@ -136,7 +136,7 @@ class CategoryController extends AbstractController
         return $this->json(
             $category,
             200,
-            ['Access-Control-Allow-Origin' => '*'],
+            [],
             ['groups' => 'get_categories']
             );
     } 

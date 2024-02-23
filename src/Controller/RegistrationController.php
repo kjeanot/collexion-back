@@ -10,23 +10,31 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RegistrationController extends AbstractController
 {
-    #[Route('/register', name: 'app_register',methods: ['POST'])]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher,EntityManagerInterface $entityManager,SerializerInterface $serializer): Response
+    #[Route('api/register', name: 'app_register',methods: ['POST'])]
+    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher,EntityManagerInterface $entityManager,SerializerInterface $serializer, ValidatorInterface $validator): Response
     {
         $userRequest = $serializer->deserialize($request->getContent(), User::class, 'json');
 
         $user = new User();
         $user->setNickname($userRequest->getNickname());
         $user->setEmail($userRequest->getEmail());
-        $user->setPassword($userPasswordHasher->hashPassword($user, $userRequest->getPassword()));
         $user->setRoles(['ROLE_USER']);
+        $user->setPassword($userPasswordHasher->hashPassword($user, $userRequest->getPassword()));
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+        $violations = $validator->validate($user);
 
-        return $this->json([$user,'message' => 'create successful'], 201);
+        if (0 !== count($violations)) {
+            return $this->json([$violations, 500, ['message' => 'error']]);
+            } else {
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            return $this->json([$user,'message' => 'create successful'], 201);
+        }
     }
 }
