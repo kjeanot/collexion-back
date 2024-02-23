@@ -2,7 +2,6 @@
 
 namespace App\Controller\Back;
 
-use App\Entity\Category;
 use App\Repository\CategoryRepository;
 use App\Repository\CommentRepository;
 use App\Repository\MyCollectionRepository;

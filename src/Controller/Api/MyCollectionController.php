@@ -3,10 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\MyCollection;
-use App\Entity\MyObject;
-use App\Entity\User;
 use App\Repository\MyObjectRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\MyCollectionRepository;
 use DateTimeImmutable;
@@ -17,6 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 // root URL for all routes from MyCollectionController
 #[Route('/api')]
@@ -50,7 +48,7 @@ class MyCollectionController extends AbstractController
             // status code
             200,
             // header
-            ['Access-Control-Allow-Origin' => '*' ],
+            [],
             // groups authorized
             ['groups' => 'get_collections']
         );
@@ -80,7 +78,7 @@ class MyCollectionController extends AbstractController
             // status code
             200,
             // header
-            ['Access-Control-Allow-Origin' => '*' ],
+            [],
             // groups authorized
             ['groups' => 'get_collection']
             );
@@ -92,32 +90,26 @@ class MyCollectionController extends AbstractController
     * @param MyCollectionRepository $myCollectionRepository
     * @return Response
     */
-   #[Route('/collection', name: 'api_my_collection_create',methods: ['POST'])]
-   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, MyObjectRepository $myObjectRepository)
+   #[Route('/secure/collection', name: 'api_my_collection_create',methods: ['POST'])]
+   public function create(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator)
    {
 
-    // $jsonData = json_decode($request->getContent(), true);
+    $updateMyCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
 
-    $myCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
-    // dd($myCollection);
+    $myCollection = new MyCollection();
 
-    // $myObjectId = $jsonData['myobjects'];
+    $myCollection->setUser($this->getUser());
+    $myCollection->setName($updateMyCollection->getName());
+    $myCollection->setDescription($updateMyCollection->getDescription());
+    $myCollection->setImage($updateMyCollection->getImage());
+    $myCollection->setUpdatedAt(New DateTimeImmutable());
+    $myCollection->setIsActive($updateMyCollection->isIsActive());
 
-    $validator = Validation::createValidator();
     $violations = $validator->validate($myCollection);
 
     if (0 !== count($violations)) {
         return $this->json([$violations,500,['message' => 'error']]); ;
     } else{
-        // retrieve user
-        $myCollection->setUser($this->getUser());
-        // foreach ($myObjectId as $object) {
-        //     $objectId = $object['id'];
-        //     $objectToAdd = $myObjectRepository->find($objectId);
-        //     if ($objectToAdd) {
-        //         $myCollection->addMyobject($objectToAdd);
-        //     }
-        // }
         
         $entityManager->persist($myCollection);
         $entityManager->flush();
@@ -132,9 +124,9 @@ class MyCollectionController extends AbstractController
     * @param MyCollectionRepository $myCollectionRepository
     * @return Response
     */
-    #[Route('/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
+    #[Route('/secure/collection/{id}', name: 'api_my_collection_update',methods: ['PUT'])]
 
-    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer, Request $request,MyObjectRepository $myObjectRepository): Response
+    public function update(MyCollection $myCollection = null, EntityManagerInterface $entityManager , SerializerInterface $serializer, Request $request,MyObjectRepository $myObjectRepository, ValidatorInterface $validator): Response
     {
         
         // check if $myCollection doesn't exist
@@ -151,32 +143,29 @@ class MyCollectionController extends AbstractController
         $updateMyCollection = $serializer->deserialize($request->getContent(), MyCollection::class, 'json');
         // retrieve related objects
         $myObjectId = $jsonData['relatedObjects'];
-        // validate data
-        $validator = Validation::createValidator();
-        $violations = $validator->validate($updateMyCollection);
+
+        $myCollection->setUser($this->getUser());
+        $myCollection->setName($updateMyCollection->getName());
+        $myCollection->setDescription($updateMyCollection->getDescription());
+        $myCollection->setImage($updateMyCollection->getImage());
+        $myCollection->setUpdatedAt(New DateTimeImmutable());
+        $myCollection->setIsActive($updateMyCollection->isIsActive());
+        foreach ($myObjectId as $object) {
+            $objectId = $object['id'];
+            $objectToRemove = $myObjectRepository->find($objectId);
+            if ($objectToRemove) {
+                $myCollection->removeMyobject($objectToRemove);
+            }
+        }
+
+        $violations = $validator->validate($myCollection);
         // if there is an error
         if (0 !== count($violations)) {
             return $this->json([$violations,500,['message' => 'error']]); ;
-        } else{
-            $myCollection->setUser($this->getUser());
-            $myCollection->setName($updateMyCollection->getName());
-            $myCollection->setDescription($updateMyCollection->getDescription());
-            $myCollection->setImage($updateMyCollection->getImage());
-            $myCollection->setUpdatedAt(New DateTimeImmutable());
-            $myCollection->setIsActive($updateMyCollection->isIsActive());
-            foreach ($myObjectId as $object) {
-                $objectId = $object['id'];
-                $objectToRemove = $myObjectRepository->find($objectId);
-                if ($objectToRemove) {
-                    $myCollection->removeMyobject($objectToRemove);
-                }
+        } else {    
+                $entityManager->flush();
+                return $this->json($serializer->serialize($myCollection, 'json', ['groups' => 'collection']), 200, ['message' => 'update successful']);
             }
-            
-            $entityManager->flush();
-
-            return $this->json($serializer->serialize($myCollection, 'json', ['groups' => 'collection']), 200, ['message' => 'update successful']);
-        }
- 
     }
 
     /**
@@ -185,7 +174,7 @@ class MyCollectionController extends AbstractController
     * @param MyCollectionRepository $myCollectionRepository
     * @return Response
     */
-    #[Route('/collection/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
+    #[Route('/secure/collection/{id}', name: 'api_my_collection_delete', methods: ['DELETE'])]
     public function delete(MyCollection $myCollection, EntityManagerInterface $manager): Response
     {
          // check if $myCollection doesn't exist
@@ -206,30 +195,38 @@ class MyCollectionController extends AbstractController
     /**
      * @Route("/uploadFile", name="upload", methods={"POST"})
      */
-    #[Route('/collection/upload_file', name: 'api_collection_upload_file', methods: ['POST'])]
+    #[Route('/secure/collection/upload_file', name: 'api_collection_upload_file', methods: ['POST'])]
     public function upload(Request $request, MyCollectionRepository $myCollectionRepository, ParameterBagInterface $params, MyCollection $myCollection,EntityManagerInterface $manager)
     {
         // for test only in the back side
-         $myCollection = $myCollectionRepository->find(19);
+         $myCollection = $myCollectionRepository->find(2);
 
         $image = $request->files->get('file');
-        
-        // enregistrement de l'image dans le dossier public du serveur
-        // paramas->get('public') =>  va chercher dans services.yaml la variable public
-        $image->move($params->get('images_collections'), $image->getClientOriginalName());
-				
-        // on ajoute uniqid() afin de ne pas avoir 2 fichiers avec le même nom
-        $newFilename = uniqid().'.'. $image->getClientOriginalName();
 
-        // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
-		// $entity est l'entity qui doit recevoir votre image
-		$myCollection->setImage($newFilename);
+        $validator = Validation::createValidator();
+        $violations = $validator->validate($image);
 
-        $manager->flush();
+        if (0 !== count($violations)) {
+            return $this->json([$violations,500,['message' => 'error']]); ;
+        } else{
+           
+            // on ajoute uniqid() afin de ne pas avoir 2 fichiers avec le même nom
+            $newFilename = uniqid().'.'. $image->getClientOriginalName();
 
-        return $this->json([
-            'message' => 'Image uploaded successfully.'
-        ]);
+             // enregistrement de l'image dans le dossier public du serveur
+            // paramas->get('public') =>  va chercher dans services.yaml la variable public
+            $image->move($params->get('images_collections'), $newFilename);
+
+            // ne pas oublier d'ajouter l'url de l'image dans l'entitée aproprié
+            // $entity est l'entity qui doit recevoir votre image
+            $myCollection->setImage($newFilename);
+
+            $manager->flush();
+
+            return $this->json([
+                'message' => 'Image uploaded successfully.'
+            ]);
+        }
     } 
     #[Route('/collection_random', name: 'api_my_collection_random',methods: ['GET'])]
     public function random(MyCollectionRepository $myCollectionRepository): Response
@@ -255,10 +252,10 @@ class MyCollectionController extends AbstractController
             // header
             [],
             // groups authorized
-            ['groups' => 'get_collections']
+            ['groups' => 'get_collection_random']
         );
     }
-    #[Route('/add/{id}/favorite', name: 'api_add_collection_favorite',methods: ['POST'])]
+    #[Route('/secure/add/{id}/favorite', name: 'api_add_collection_favorite',methods: ['POST'])]
     public function newFavorite(MyCollection $myCollection = null, EntityManagerInterface $entityManager,): Response
     {
         // check if $myCollection doesn't exist
@@ -289,7 +286,7 @@ class MyCollectionController extends AbstractController
         );
     }
 
-        #[Route('/delete/{id}/favorite', name: 'api_delete_collection_favorite',methods: ['POST'])]
+        #[Route('/secure/delete/{id}/favorite', name: 'api_delete_collection_favorite',methods: ['POST'])]
     public function deleteFavorite(MyCollection $myCollection = null, EntityManagerInterface $entityManager): Response
     {
         // check if $myCollection doesn't exist

@@ -50,7 +50,7 @@ class CategoryController extends AbstractController
                 // Move the file to the directory where brochures are stored
                 try {
                     $imageName->move(
-                        $this->getParameter('images_collections'),
+                        $this->getParameter('images_categories'),
                         $newFilename
                     );
                 } catch (FileException $e) {
@@ -104,7 +104,7 @@ class CategoryController extends AbstractController
                 // Move the file to the directory where brochures are stored
                 try {
                     $imageName->move(
-                        $this->getParameter('images_collections'),
+                        $this->getParameter('images_categories'),
                         $newFilename
                     );
                 } catch (FileException $e) {
